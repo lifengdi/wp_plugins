@@ -1,0 +1,316 @@
+/* 通用标签基础样式 - 无阴影+行高1.375+居中核心 */
+.comment-user-rank,
+.comment-user-friend,
+.comment-user-admin {
+    display: inline-flex; /* 改为inline-flex，确保内部文本水平居中 */
+    align-items: center;
+    justify-content: center; /* 强制span内部文本水平居中 */
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    margin-left: 6px;
+    line-height: 1.375;
+    vertical-align: middle;
+    font-weight: 500;
+    margin-right: 3px;
+    border: none;
+    transition: all 0.2s ease-in-out;
+    align-self: center;
+    box-sizing: border-box;
+    position: relative;
+    text-align: center; /* 兜底：文本水平居中 */
+    top: -1px;
+}
+
+/* 评论作者容器 - 强制水平+垂直居中 */
+.author_name {
+    display: inline-flex; align-items: center; justify-content: center;vertical-align: middle;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    line-height: 1.375;
+    width: 100%; /* 确保容器宽度足够 */
+}
+
+/* 作者姓名容器 - 确保与标签对齐 */
+.author_name .fn,
+.author_name a {
+    line-height: 1.375;
+    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* 12级段位专属配色（严格对应：黑铁→青铜→白银→黄金→铂金→钻石→大师→超凡大师→宗师→傲世宗师→王者→最强王者） */
+/* 1级：黑铁 */
+.comment-user-rank.rank-1 {
+    background-color: #232323 !important; /* 哑光黑铁 */
+    color: #E8E8E8 !important;
+    font-weight: 500;
+}
+/* 2级：青铜 */
+.comment-user-rank.rank-2 {
+    background-color: #8A6E4F !important; /* 复古青铜 */
+    color: #FFFFFF !important;
+    font-weight: 500;
+}
+/* 3级：白银 */
+.comment-user-rank.rank-3 {
+    background-color: #C9C9C9 !important; /* 亮面白银 */
+    color: #1A1A1A !important;
+    font-weight: 500;
+}
+/* 4级：黄金 */
+.comment-user-rank.rank-4 {
+    background-color: #FFD700 !important; /* 亮面黄金 */
+    color: #1A1A1A !important;
+    font-weight: 600;
+}
+/* 5级：铂金 */
+.comment-user-rank.rank-5 {
+    background: linear-gradient(120deg, #E6E8FA 0%, #D0D8F0 100%) !important; /* 铂金渐变 */
+    color: #1A1A1A !important;
+    font-weight: 600;
+}
+/* 6级：钻石 */
+.comment-user-rank.rank-6 {
+    background: linear-gradient(120deg, #74D0FF 0%, #4A90E2 100%) !important; /* 钻石蓝渐变 */
+    color: #FFFFFF !important;
+    font-weight: 600;
+}
+/* 7级：大师 */
+.comment-user-rank.rank-7 {
+    background: linear-gradient(120deg, #9D75CB 0%, #7B5BBF 100%) !important; /* 大师紫渐变 */
+    color: #FFFFFF !important;
+    font-weight: 700;
+}
+/* 8级：超凡大师 */
+.comment-user-rank.rank-8 {
+    background: linear-gradient(120deg, #B76CFE 0%, #9A48E8 100%) !important; /* 超凡大师深紫渐变 */
+    color: #FFFFFF !important;
+    font-weight: 700;
+}
+/* 9级：宗师 */
+.comment-user-rank.rank-9 {
+    background: linear-gradient(120deg, #FF7A7A 0%, #E84848 100%) !important; /* 宗师红渐变 */
+    color: #FFFFFF !important;
+    font-weight: 700;
+}
+/* 10级：傲世宗师 */
+.comment-user-rank.rank-10 {
+    background: linear-gradient(120deg, #FF5722 0%, #E64A19 100%) !important; /* 傲世宗师橙红渐变 */
+    color: #FFFFFF !important;
+    font-weight: 700;
+}
+/* 11级：王者 */
+.comment-user-rank.rank-11 {
+    background: linear-gradient(120deg, #FFD700 0%, #F5C100 100%) !important; /* 王者金渐变 */
+    color: #1A1A1A !important;
+    font-weight: 800;
+}
+/* 12级：最强王者 */
+.comment-user-rank.rank-12 {
+    background: linear-gradient(120deg, #FF0040 0%, #C70039 100%) !important; /* 最强王者猩红渐变 */
+    color: #FFFFFF !important;
+    font-weight: 800;
+    box-shadow: none !important;
+}
+
+/* 管理员标签 - 最强王者同款渐变+优先级强化 */
+.comment-user-admin {
+    background: linear-gradient(120deg, #FF0040 0%, #C70039 100%) !important;
+    color: #ffffff !important;
+    font-weight: 800;
+}
+.comment-user-admin:hover {
+    background: linear-gradient(120deg, #FF1A53 0%, #D80040 100%) !important;
+    transform: translateY(-1px);
+    color: #ffffff !important;
+}
+
+/* 友链标签 - 铂金钻石混合渐变+图标对齐 */
+.comment-user-friend {
+    border-radius: 0 6px 6px 0;
+    padding: 2px 8px 2px 12px;
+    position: relative;
+    background: linear-gradient(120deg, #74D0FF 0%, #9D75CB 100%) !important; /* 钻石+大师渐变 */
+    color: #FFFFFF !important;
+    font-weight: 600;
+    border-left: 2px solid #4A90E2 !important; /* 深一度蓝描边 */
+    justify-content: flex-start; /* 友链标签因图标偏移，文本左对齐更美观 */
+    text-align: left;
+}
+
+/* 友链图标 - 精准对齐+配色适配 */
+.comment-user-friend::before {
+    content: "⭐";
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9em;
+    background: #FFFFFF !important;
+    color: #4A90E2 !important; /* 图标颜色匹配友链标签 */
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 图标内部水平居中 */
+    line-height: 1;
+}
+
+/* 友链标签Hover - 渐变反转+新配色 */
+.comment-user-friend:hover {
+    background: linear-gradient(120deg, #9D75CB 0%, #74D0FF 100%) !important;
+    transform: scale(1.05);
+    color: #FFFFFF !important;
+    box-shadow: none !important;
+}
+
+/* 等级标签Hover（金属质感强化） */
+.comment-user-rank:hover {
+    opacity: 0.95;
+    transform: translateY(-1px);
+    filter: brightness(1.1); /* hover提亮，强化金属质感 */
+}
+
+/* 移动端适配 - 水平居中保留 */
+@media (max-width: 768px) {
+    .comment-user-rank,
+    .comment-user-admin {
+        font-size: 0.75em;
+        padding: 1px 6px;
+        border-radius: 4px;
+        line-height: 1.375;
+    }
+    .comment-user-friend {
+        font-size: 0.75em;
+        padding: 1px 6px 1px 10px;
+        border-radius: 0 4px 4px 0;
+        line-height: 1.375;
+    }
+    .comment-user-friend::before {
+        left: -7px;
+        width: 14px;
+        height: 14px;
+        font-size: 0.8em;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    .comment-author {
+        gap: 3px;
+    }
+}
+
+/* 暗黑模式适配 - 12级段位暗调配色 */
+@media (prefers-color-scheme: dark) {
+    /* 1级：黑铁（暗黑） */
+    .comment-user-rank.rank-1 {
+        background-color: #171717 !important;
+        color: #F0F0F0 !important;
+    }
+    /* 2级：青铜（暗黑） */
+    .comment-user-rank.rank-2 {
+        background-color: #6D553F !important;
+        color: #FFFFFF !important;
+    }
+    /* 3级：白银（暗黑） */
+    .comment-user-rank.rank-3 {
+        background-color: #8A8A8A !important;
+        color: #FFFFFF !important;
+    }
+    /* 4级：黄金（暗黑） */
+    .comment-user-rank.rank-4 {
+        background-color: #D4AF37 !important;
+        color: #1A1A1A !important;
+    }
+    /* 5级：铂金（暗黑） */
+    .comment-user-rank.rank-5 {
+        background: linear-gradient(120deg, #4A5066 0%, #3A4059 100%) !important;
+        color: #FFFFFF !important;
+    }
+    /* 6级：钻石（暗黑） */
+    .comment-user-rank.rank-6 {
+        background: linear-gradient(120deg, #2A6BA8 0%, #1A5B90 100%) !important;
+        color: #FFFFFF !important;
+    }
+    /* 7级：大师（暗黑） */
+    .comment-user-rank.rank-7 {
+        background: linear-gradient(120deg, #6A4A99 0%, #5A3A88 100%) !important;
+        color: #FFFFFF !important;
+    }
+    /* 8级：超凡大师（暗黑） */
+    .comment-user-rank.rank-8 {
+        background: linear-gradient(120deg, #8A38D8 0%, #7A28C8 100%) !important;
+        color: #FFFFFF !important;
+    }
+    /* 9级：宗师（暗黑） */
+    .comment-user-rank.rank-9 {
+        background: linear-gradient(120deg, #C83838 0%, #B82828 100%) !important;
+        color: #FFFFFF !important;
+    }
+    /* 10级：傲世宗师（暗黑） */
+    .comment-user-rank.rank-10 {
+        background: linear-gradient(120deg, #D84818 0%, #C83808 100%) !important;
+        color: #FFFFFF !important;
+    }
+    /* 11级：王者（暗黑） */
+    .comment-user-rank.rank-11 {
+        background: linear-gradient(120deg, #B8860B 0%, #A8760A 100%) !important;
+        color: #1A1A1A !important;
+    }
+    /* 12级：最强王者（暗黑） */
+    .comment-user-rank.rank-12 {
+        background: linear-gradient(120deg, #A80030 0%, #980020 100%) !important;
+        color: #FFFFFF !important;
+        box-shadow: none !important;
+    }
+    /* 暗黑模式管理员标签 */
+    .comment-user-admin {
+        background: linear-gradient(120deg, #A80030 0%, #980020 100%) !important;
+        color: #FFFFFF !important;
+        box-shadow: none !important;
+    }
+    .comment-user-admin:hover {
+        background: linear-gradient(120deg, #B81A40 0%, #A80A30 100%) !important;
+        color: #FFFFFF !important;
+    }
+    /* 暗黑模式友链标签 */
+    .comment-user-friend {
+        background: linear-gradient(120deg, #2A6BA8 0%, #6A4A99 100%) !important;
+        color: #FFFFFF !important;
+        border-left: 2px solid #1A5B90 !important;
+        box-shadow: none !important;
+    }
+    .comment-user-friend::before {
+        background: #121212 !important;
+        color: #74D0FF !important;
+        box-shadow: none !important;
+    }
+    .comment-user-friend:hover {
+        background: linear-gradient(120deg, #6A4A99 0%, #2A6BA8 100%) !important;
+        color: #FFFFFF !important;
+    }
+}
+
+/* 无障碍适配 */
+@media (prefers-contrast: more) {
+    .comment-user-rank,
+    .comment-user-friend,
+    .comment-user-admin {
+        color: #FFFFFF !important;
+        opacity: 0.98;
+        box-shadow: none !important;
+        filter: contrast(1.2);
+    }
+}
+
+/* 终极兜底：解决span居中问题 */
+.comment-user-rank span,
+.comment-user-admin span,
+.comment-user-friend span {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
