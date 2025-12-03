@@ -38,6 +38,32 @@ function create_shuoshuo_post_type() {
 }
 add_action('init', 'create_shuoshuo_post_type');
 
+// 为说说自定义文章类型自动填充默认标题（微言微语+日期时间）
+function shuoshuo_auto_set_default_title($post_id, $post, $update) {
+    // 1. 排除自动保存/修订版本/非说说类型
+    if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id) || $post->post_type !== 'shuoshuo') {
+        return;
+    }
+
+    // 2. 仅在标题为空时执行（新增/编辑都生效）
+    if (empty(trim($post->post_title))) {
+        // ========== 修改点：自定义标题格式为「微言微语-YYYY-MM-DD HH:MM」 ==========
+        $default_title = '微言微语-' . date('Y-m-d H:i', current_time('timestamp'));
+
+        // 3. 避免无限循环，临时移除当前钩子再更新
+        remove_action('save_post_shuoshuo', 'shuoshuo_auto_set_default_title');
+
+        // 4. 更新标题（不修改其他字段）
+        wp_update_post(array(
+            'ID'         => $post_id,
+            'post_title' => $default_title
+        ));
+
+        // 5. 恢复钩子
+        add_action('save_post_shuoshuo', 'shuoshuo_auto_set_default_title', 10, 3);
+    }
+}
+add_action('save_post_shuoshuo', 'shuoshuo_auto_set_default_title', 10, 3);
 
 require_once plugin_dir_path( __FILE__ ).'custom-shuoshuo-template.php';
 
