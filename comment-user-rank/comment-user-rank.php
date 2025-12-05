@@ -154,43 +154,7 @@ function cur_build_friend_tag() {
 }
 
 /**
- * 为带链接的评论作者添加标签
- */
-// function cur_add_tags_to_author_link($author_link, $comment_id) {
-//     $comment = get_comment($comment_id);
-//     if (!$comment) return $author_link;
-    
-//     // 管理员显示「管理」标签
-//     if (cur_is_admin_comment($comment)) {
-//         $author_link .= cur_build_admin_tag();
-//         // 管理员显示「友」标签
-//         $url = $comment->comment_author_url;
-//         if (cur_is_friend_link($url)) {
-//             $author_link .= cur_build_friend_tag();
-//         }
-//         return $author_link;
-//     }
-    
-//     // 非管理员显示12级等级标签
-//     $email = $comment->comment_author_email;
-//     $name = $comment->comment_author;
-//     $url = $comment->comment_author_url;
-    
-//     $count = cur_get_comment_count($email, $name, $url);
-//     $rank = cur_get_user_rank($count);
-//     $is_friend = cur_is_friend_link($url);
-    
-//     $author_link .= cur_build_rank_tag($rank);
-//     if ($is_friend) {
-//         $author_link .= cur_build_friend_tag();
-//     }
-    
-//     return $author_link;
-// }
-// add_filter('get_comment_author_link', 'cur_add_tags_to_author_link', 10, 2);
-
-/**
- * 为无链接的评论作者添加标签
+ * 为评论作者添加标签
  */
 function cur_add_tags_to_author_text($author, $comment_id) {
     if (strpos($author, 'comment-user-') !== false) {
