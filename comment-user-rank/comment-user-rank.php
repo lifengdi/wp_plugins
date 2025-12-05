@@ -154,10 +154,41 @@ function cur_build_friend_tag() {
 }
 
 /**
+ * 标记当前是否为小工具渲染上下文
+ */
+function init_widget_render_flag() {
+    global $is_widget_rendering;
+    $is_widget_rendering = false; // 初始化默认值
+
+    // 拦截所有小工具的渲染，标记状态
+    add_filter('widget_display_callback', function($instance, $widget, $args) {
+        global $is_widget_rendering;
+        $is_widget_rendering = true; // 进入小工具渲染，标记为 true
+        return $instance;
+    }, 1, 3);
+
+    // 小工具渲染结束后，重置标记（避免影响后续逻辑）
+    add_action('dynamic_sidebar_after', function() {
+        global $is_widget_rendering;
+        $is_widget_rendering = false;
+    });
+}
+add_action('init', 'init_widget_render_flag');
+
+/**
  * 为评论作者添加标签
  */
 function cur_add_tags_to_author_text($author, $comment_id) {
+
+    if (is_admin()) {
+        return $author;
+    }
     if (strpos($author, 'comment-user-') !== false) {
+        return $author;
+    }
+
+    global $is_widget_rendering;
+	if ($is_widget_rendering) {
         return $author;
     }
     
