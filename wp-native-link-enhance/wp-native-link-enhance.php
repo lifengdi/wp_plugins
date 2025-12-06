@@ -157,7 +157,7 @@ function wnle_render_admin_page() {
                <code>[wp_native_links style="grid" number="12" show_logo="yes" show_desc="yes" title="合作伙伴" show_category="yes" orderby="link_name" order="ASC"]</code>
             </p>
             <p>2. RSS聚合简码示例：<br>
-               <code>[link_rss_aggregator category="tech" limit="10" default_logo="<?php echo WNLE_PLUGIN_URL; ?>images/default-logo.png"]</code>
+               <code>[link_rss_aggregator category="tech" pagination="yes" limit="10"  default_logo="<?php echo WNLE_PLUGIN_URL; ?>images/default-logo.png"]</code>
             </p>
             <p>3. 测试RSS抓取：<br>
                <code><a href="<?php echo home_url('?test_wnle_rss=1'); ?>" target="_blank">点击测试RSS抓取（仅管理员可见）</a></code>
