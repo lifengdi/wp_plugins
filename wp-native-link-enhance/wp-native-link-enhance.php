@@ -439,7 +439,7 @@ function wnle_fetch_rss() {
     }
 
     // 5. 清理过期数据
-    $expire_time = time() - (30 * 86400);
+    $expire_time = time() - (365 * 86400);
     $delete_count = $wpdb->delete($table, array('publish_date <' => $expire_time), array('%d'));
     wnle_write_log('RSS抓取完成，清理过期数据：' . $delete_count . '条');
 }
@@ -453,16 +453,24 @@ function wnle_rss_shortcode($atts) {
     }
 
     $default_atts = array(
-        'category' => '',
-        'limit'    => 5,
-        'default_logo' => ''
+        'category'     => '',
+        'limit'        => 5,
+        'default_logo' => '',
+        'pagination'   => 'yes' // 新增：控制是否显示分页
     );
     $atts = shortcode_atts($default_atts, $atts, 'link_rss_aggregator');
 
+    // 处理参数（重点：使用独立分页参数 rss_page，避免冲突）
     $category = sanitize_text_field((string) $atts['category']);
-    $limit = max(1, min(50, (int) $atts['limit']));
+    $limit = max(1, min(50, (int) $atts['limit'])); // 限制最大50条/页
     $default_logo = esc_url((string) $atts['default_logo']);
+    $show_pagination = strtolower((string) $atts['pagination']) === 'no' ? false : true;
 
+    // 获取当前页码（从URL参数 rss_page 读取，默认第1页）
+    $current_page = isset($_GET['rss_page']) ? max(1, (int) $_GET['rss_page']) : 1;
+    $offset = ($current_page - 1) * $limit;
+
+    // 1. 构建查询条件
     $where = '';
     $where_args = array();
     if (!empty($category)) {
@@ -470,18 +478,31 @@ function wnle_rss_shortcode($atts) {
         $where_args[] = $category;
     }
 
-    $query = $wpdb->prepare(
-        "SELECT * FROM " . WNLE_TABLE . " $where ORDER BY publish_date DESC LIMIT %d",
-        array_merge($where_args, array($limit))
+    // 2. 查询总记录数（用于计算总页数）
+    $count_sql = $wpdb->prepare(
+        "SELECT COUNT(*) FROM " . WNLE_TABLE . " $where",
+        $where_args
     );
-    $items = $wpdb->get_results($query);
+    $total_items = (int) $wpdb->get_var($count_sql);
+    $total_pages = $show_pagination ? ceil($total_items / $limit) : 1;
 
+    // 3. 查询当前页数据
+    $data_sql = $wpdb->prepare(
+        "SELECT * FROM " . WNLE_TABLE . " $where ORDER BY publish_date DESC LIMIT %d OFFSET %d",
+        array_merge($where_args, array($limit, $offset))
+    );
+    $items = $wpdb->get_results($data_sql);
+
+    // 空数据处理
     if (empty($items)) {
-        return '<div class="link-rss-container"><div class="lra-error">暂无RSS文章数据</div></div>';
+        $error_msg = $current_page > 1 ? '当前页没有数据' : '暂无RSS文章数据';
+        return '<div class="link-rss-container"><div class="lra-error">' . $error_msg . '</div></div>';
     }
 
+    // 4. 输出RSS列表
     $output = '<div class="link-rss-container">';
     $output .= '<ul class="link-rss-aggregator">';
+
     foreach ($items as $item) {
         $logo = !empty($item->logo) ? esc_url((string) $item->logo) : $default_logo;
         $source_name = esc_html((string) $item->source_name);
@@ -495,14 +516,16 @@ function wnle_rss_shortcode($atts) {
         $article_link = esc_url((string) $item->link);
         $description = wp_kses_post((string) $item->description);
 
+        // 首字母占位符逻辑
         $initials = '';
         $avatar_class = 'lra-avatar';
         if (empty($logo)) {
             $avatar_class .= ' lra-avatar-placeholder';
-            $initials = mb_substr($source_name, 0, 1, 'UTF-8');
+            $initials = mb_substr($source_name ?: '无', 0, 1, 'UTF-8');
             $initials = strtoupper((string) $initials);
         }
 
+        // 单个RSS条目HTML
         $item_html = '<li class="lra-card">';
         $item_html .= '<div class="lra-header">';
         $item_html .= '<div class="' . $avatar_class . '">';
@@ -527,7 +550,71 @@ function wnle_rss_shortcode($atts) {
 
         $output .= $item_html;
     }
+
     $output .= '</ul>';
+
+    // 5. 分页导航（关键修复：确保链接正确传递所有参数）
+    if ($show_pagination && $total_pages > 1) {
+        $output .= '<div class="lra-pagination">';
+        $output .= '<div class="lra-pagination-info">共 ' . $total_items . ' 条，' . $total_pages . ' 页</div>';
+        $output .= '<nav class="lra-pagination-links">';
+
+        // 构建当前页面URL（保留所有原有参数）
+        $current_url = add_query_arg(array(), $_SERVER['REQUEST_URI']);
+        // 移除URL中已有的 rss_page 参数（避免重复）
+        $current_url = remove_query_arg('rss_page', $current_url);
+
+        // 上一页
+        if ($current_page > 1) {
+            $prev_url = add_query_arg('rss_page', $current_page - 1, $current_url);
+            $output .= '<a href="' . esc_url($prev_url) . '" class="lra-pagination-prev">上一页</a>';
+        }
+
+        // 页码链接（显示当前页±2页，避免页码过多）
+        $start_page = max(1, $current_page - 2);
+        $end_page = min($total_pages, $current_page + 2);
+
+        // 显示第一页（如果当前页>3）
+        if ($start_page > 1) {
+            $first_url = add_query_arg('rss_page', 1, $current_url);
+            $output .= '<a href="' . esc_url($first_url) . '" class="lra-pagination-page">1</a>';
+            if ($start_page > 2) {
+                $output .= '<span class="lra-pagination-ellipsis">...</span>';
+            }
+        }
+
+        // 中间页码
+        for ($i = $start_page; $i <= $end_page; $i++) {
+            $page_class = 'lra-pagination-page';
+            if (abs($i - $current_page) <= 1) {
+                $page_class .= ' current-adjacent';
+            }
+            if ($i == $current_page) {
+                $output .= '<span class="lra-pagination-current">' . $i . '</span>'; // 当前页高亮
+            } else {
+                $page_url = add_query_arg('rss_page', $i, $current_url);
+                $output .= '<a href="' . esc_url($page_url) . '" class="' . $page_class . '">' . $i . '</a>';
+            }
+        }
+
+        // 显示最后一页（如果当前页<总页数-2）
+        if ($end_page < $total_pages) {
+            if ($end_page < $total_pages - 1) {
+                $output .= '<span class="lra-pagination-ellipsis">...</span>';
+            }
+            $last_url = add_query_arg('rss_page', $total_pages, $current_url);
+            $output .= '<a href="' . esc_url($last_url) . '" class="lra-pagination-page">' . $total_pages . '</a>';
+        }
+
+        // 下一页
+        if ($current_page < $total_pages) {
+            $next_url = add_query_arg('rss_page', $current_page + 1, $current_url);
+            $output .= '<a href="' . esc_url($next_url) . '" class="lra-pagination-next">下一页</a>';
+        }
+
+        $output .= '</nav></div>';
+    }
+
     $output .= '</div>';
 
     return $output;

@@ -203,3 +203,99 @@
         font-size: 12px;
     }
 }
+/* 分页样式（居中版） */
+.lra-pagination {
+    margin-top: 20px;
+    padding: 15px 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    text-align: center; /* 1. 父容器居中，让分页链接整体居中 */
+}
+
+.lra-pagination-info {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.lra-pagination-links {
+    display: inline-flex; /* 2. 改为行内弹性盒，跟随父容器居中 */
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center; /* 3. 内部元素居中（应对分页换行情况） */
+}
+
+.lra-pagination a,
+.lra-pagination-current,
+.lra-pagination-ellipsis { /* 补充省略号样式，保持视觉统一 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.lra-pagination a {
+    color: #4299e1;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+}
+
+.lra-pagination a:hover {
+    color: #3182ce;
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.lra-pagination-current {
+    color: #ffffff;
+    background-color: #4299e1;
+    border: 1px solid #4299e1;
+    font-weight: 500;
+}
+
+.lra-pagination-prev,
+.lra-pagination-next {
+    padding: 0 12px !important;
+}
+
+/* 省略号样式（补充，避免和按钮样式冲突） */
+.lra-pagination-ellipsis {
+    color: #6b7280;
+    border: none;
+    background: transparent;
+    min-width: auto; /* 取消固定宽度，自适应 */
+    padding: 0 8px;
+}
+
+/* 禁用状态样式（补充，保持风格统一） */
+.lra-pagination-prev.disabled,
+.lra-pagination-next.disabled {
+    color: #9ca3af;
+    background-color: #f3f4f6;
+    border-color: #e5e7eb;
+    cursor: not-allowed;
+    pointer-events: none; /* 禁止点击 */
+}
+
+/* 移动端分页适配 */
+@media (max-width: 768px) {
+    .lra-pagination {
+        padding: 12px 15px;
+    }
+
+    .lra-pagination a,
+    .lra-pagination-current,
+    .lra-pagination-ellipsis {
+        min-width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+}
