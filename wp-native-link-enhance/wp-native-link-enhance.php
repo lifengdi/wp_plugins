@@ -464,7 +464,7 @@ function wnle_fetch_rss() {
             }
 
             // 获取前5条数据
-            $items = $feed->get_items(0, 5);
+            $items = $feed->get_items(0, 10);
             wnle_write_log('【' . $link_name . '】实际处理条目数：' . count($items));
 
             // 准备基础数据
