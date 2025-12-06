@@ -206,9 +206,9 @@
 .lra-pagination {
     margin-top: 20px;
     padding: 15px 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    /*background-color: #ffffff;*/
+    /*border-radius: 8px;*/
+    /*box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);*/
     text-align: center; /* 1. 父容器居中，让分页链接整体居中 */
 }
 
