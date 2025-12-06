@@ -4,7 +4,6 @@
 
 /* 外层容器：控制整体宽度和居中 */
 .link-rss-container {
-    max-width: 800px; /* PC端最大宽度 */
     margin: 20px auto;
     padding: 0 15px;
 }
