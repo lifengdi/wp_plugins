@@ -18,7 +18,94 @@ define('WNLE_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // ===================== 工具函数：安全日志记录（适配PHP8.4） =====================
 function wnle_write_log($message) {
+    // 1. 仅在 DEBUG 模式或管理员触发时记录（避免生产环境冗余日志）
+    if (!defined('WP_DEBUG') || !WP_DEBUG) {
+        // 允许通过常量强制开启日志（生产环境临时排查问题用）
+        if (!defined('WNLE_FORCE_LOG') || !WNLE_FORCE_LOG) {
+            return;
+        }
+    }
 
+    // 2. 日志基础配置
+    $log_dir = WP_CONTENT_DIR . '/logs/'; // 日志存储目录（wp-content/logs/）
+    $log_file = $log_dir . 'wnle_rss.log'; // 日志文件名
+    $max_log_size = 5 * 1024 * 1024; // 日志最大容量（5MB，避免文件过大）
+
+    // 3. 处理日志内容（适配PHP8.4严格类型，避免Notice）
+    // 若为数组/对象，自动序列化；其他类型转字符串
+    if (is_array($message) || is_object($message)) {
+        // PHP8.4 推荐使用 json_encode 替代 serialize，更安全易读
+        $log_content = json_encode($message, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        // 序列化失败时降级处理
+        if ($log_content === false) {
+            $log_content = var_export($message, true);
+        }
+    } else {
+        // 强制转字符串（处理布尔值、NULL等）
+        $log_content = (string)$message;
+    }
+
+    // 4. 日志格式：时间戳 + 来源 + 内容（便于排查）
+    $timestamp = date('Y-m-d H:i:s'); // 本地时间戳
+    $log_entry = sprintf(
+        "[%s] [WNLE-Plugin] %s\n",
+        $timestamp,
+        $log_content
+    );
+
+    // 5. 确保日志目录存在且可写（适配PHP8.4权限校验）
+    try {
+        // 检查目录是否存在，不存在则创建（递归创建多级目录）
+        if (!file_exists($log_dir)) {
+            mkdir($log_dir, 0755, true); // 0755 权限：所有者读写执行，其他读执行
+            // 写入目录索引文件（防止目录被浏览）
+            file_put_contents($log_dir . 'index.html', '<!DOCTYPE html><html><head><title>Logs</title></head><body></body></html>');
+        }
+
+        // 检查目录可写性（PHP8.4 更严格的权限检测）
+        if (!is_writable($log_dir)) {
+            // 尝试修复权限（仅本地环境有效，服务器可能限制）
+            chmod($log_dir, 0755);
+            if (!is_writable($log_dir)) {
+                error_log('WNLE插件：日志目录不可写 - ' . $log_dir);
+                return;
+            }
+        }
+
+        // 6. 日志轮转（避免单个文件过大）
+        if (file_exists($log_file) && filesize($log_file) >= $max_log_size) {
+            // 重命名旧日志（添加时间戳）
+            $backup_file = $log_dir . 'wnle_rss_' . date('YmdHis') . '.log';
+            rename($log_file, $backup_file);
+            // 压缩旧日志（PHP8.4 支持 gzcompress 直接压缩）
+            $backup_content = file_get_contents($backup_file);
+            if ($backup_content !== false) {
+                file_put_contents($backup_file . '.gz', gzcompress($backup_content, 6));
+                unlink($backup_file); // 删除原始旧日志
+            }
+        }
+
+        // 7. 写入日志（加锁避免并发写入冲突，适配PHP8.4）
+        $file_handle = fopen($log_file, 'a'); // 追加模式
+        if ($file_handle) {
+            flock($file_handle, LOCK_EX); // 独占锁，防止多进程同时写入
+            fwrite($file_handle, $log_entry);
+            flock($file_handle, LOCK_UN); // 释放锁
+            fclose($file_handle);
+
+            // 确保日志文件权限安全（仅所有者可写）
+            chmod($log_file, 0644);
+        } else {
+            error_log('WNLE插件：无法打开日志文件 - ' . $log_file);
+        }
+    } catch (Throwable $e) {
+        // PHP8.4 支持 Throwable 捕获所有异常和错误
+        error_log(sprintf(
+            'WNLE插件日志写入失败：%s（行号：%d）',
+            $e->getMessage(),
+            $e->getLine()
+        ));
+    }
 }
 
 // ===================== 工具函数：重建数据表（适配MySQL10.5） =====================
@@ -157,7 +244,7 @@ function wnle_render_admin_page() {
                <code>[wp_native_links style="grid" number="12" show_logo="yes" show_desc="yes" title="合作伙伴" show_category="yes" orderby="link_name" order="ASC"]</code>
             </p>
             <p>2. RSS聚合简码示例：<br>
-               <code>[link_rss_aggregator category="tech" pagination="yes" limit="10"  default_logo="<?php echo WNLE_PLUGIN_URL; ?>images/default-logo.png"]</code>
+               <code>[link_rss_aggregator category="tech" limit="10" default_logo="<?php echo WNLE_PLUGIN_URL; ?>images/default-logo.png"]</code>
             </p>
             <p>3. 测试RSS抓取：<br>
                <code><a href="<?php echo home_url('?test_wnle_rss=1'); ?>" target="_blank">点击测试RSS抓取（仅管理员可见）</a></code>
@@ -363,8 +450,8 @@ function wnle_fetch_rss() {
                 continue;
             }
 
-            $feed->set_timeout(15);
-            $feed->set_useragent('WordPress-WNLE-RSS/1.4 (PHP8.4; WP6.8.3)');
+//             $feed->set_timeout(15);
+//             $feed->set_useragent('WordPress-WNLE-RSS/1.4 (PHP8.4; WP6.8.3)');
 
             // 检查Feed条目
             $feed_items_count = $feed->get_item_quantity();
@@ -767,36 +854,36 @@ function wnle_load_styles() {
 }
 
 // ===================== 8. 手动抓取+测试功能（修正读取原生link_rss） =====================
-// add_action('admin_bar_menu', 'wnle_add_admin_bar_item', 100);
-// function wnle_add_admin_bar_item($wp_admin_bar) {
-//     if (!current_user_can('manage_options')) {
-//         return;
-//     }
-//     $nonce = wp_create_nonce('wnle_rss_fetch_nonce');
-//     $wp_admin_bar->add_node(array(
-//         'id'    => 'wnle_fetch_rss',
-//         'title' => '手动抓取RSS',
-//         'href'  => admin_url('admin-ajax.php?action=wnle_manual_fetch_rss&_wpnonce=' . $nonce),
-//         'meta'  => array('target' => '_blank')
-//     ));
-// }
+add_action('admin_bar_menu', 'wnle_add_admin_bar_item', 100);
+function wnle_add_admin_bar_item($wp_admin_bar) {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+    $nonce = wp_create_nonce('wnle_rss_fetch_nonce');
+    $wp_admin_bar->add_node(array(
+        'id'    => 'wnle_fetch_rss',
+        'title' => '手动抓取RSS',
+        'href'  => admin_url('admin-ajax.php?action=wnle_manual_fetch_rss&_wpnonce=' . $nonce),
+        'meta'  => array('target' => '_blank')
+    ));
+}
 
-// add_action('wp_ajax_wnle_manual_fetch_rss', 'wnle_manual_fetch_rss');
-// function wnle_manual_fetch_rss() {
-//     check_admin_referer('wnle_rss_fetch_nonce', '_wpnonce');
-//     if (!current_user_can('manage_options')) {
-//         wp_die('无权限执行此操作');
-//     }
+add_action('wp_ajax_wnle_manual_fetch_rss', 'wnle_manual_fetch_rss');
+function wnle_manual_fetch_rss() {
+    check_admin_referer('wnle_rss_fetch_nonce', '_wpnonce');
+    if (!current_user_can('manage_options')) {
+        wp_die('无权限执行此操作');
+    }
 
-//     ob_start();
-//     wnle_fetch_rss();
-//     $output = ob_get_clean();
+    ob_start();
+    wnle_fetch_rss();
+    $output = ob_get_clean();
 
-//     wnle_write_log('手动抓取执行结果：' . (empty($output) ? '无输出' : $output));
+    wnle_write_log('手动抓取执行结果：' . (empty($output) ? '无输出' : $output));
 
-//     wp_safe_redirect(admin_url('options-general.php?page=wnle-link-settings&fetch=success'));
-//     exit;
-// }
+    wp_safe_redirect(admin_url('options-general.php?page=wnle-link-settings&fetch=success'));
+    exit;
+}
 
 // 独立测试功能（修正读取原生link_rss字段）
 add_action('init', 'wnle_test_rss_fetch');
