@@ -1,211 +1,488 @@
-/* 基础容器样式 */
-.wp-native-link-container {
-    margin: 1.5rem 0;
-    overflow: hidden;
-    width: 100%;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    box-sizing: border-box;
+/* ===================== 全局变量定义（优先适配移动端） ===================== */
+:root {
+    --link-primary: #1890ff;
+    --link-hover: #40a9ff;
+    --link-text: #333;
+    --link-desc: #666;
+    --link-border: #eee;
+    --link-bg: #fff;
+    --link-placeholder-bg: #336699;
+    --link-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    --link-radius: 6px;
+    --link-card-radius: 8px;
+    --link-gap: 1.5rem;
+    /* Logo尺寸放大：PC端60px，移动端44px */
+    --logo-size: 60px;
+    --logo-size-mobile: 60px;
+    /* 卡片式Logo额外放大 */
+    --logo-size-card: 64px;
+    --logo-size-card-mobile: 64px;
+    --animation-space: 4px;
+    --mobile-gutter: 12px;
+    --pc-max-width: 1400px;
+    --pc-min-width: 900px;
 }
 
-/* 整体标题样式 */
+
+/* ===================== 核心修复：容器居中 + 横向宽度优化 ===================== */
+.wp-native-link-container {
+    margin: 1rem auto !important;
+    width: 100%;
+    max-width: var(--pc-max-width) !important;
+    min-width: 320px !important;
+    padding: var(--animation-space) var(--mobile-gutter) 1rem !important;
+    position: relative;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.wp-native-link-list,
+.wp-native-link-grid,
+.wp-native-link-card,
+.wp-native-link-empty {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+}
+
+/* ===================== 标题样式（主标题居中，分类标题左对齐） ===================== */
 .wp-native-link-main-title {
-    font-size: 1.35rem;
-    margin: 1.5rem 0 1.2rem;
+    font-size: clamp(1.2rem, 5vw, 1.5rem);
+    margin: 1rem 0 1.2rem !important;
     padding-bottom: 0.6rem;
     font-weight: 600;
-}
-
-/* 分类标题样式（按分类显示时的标题） */
-.wp-native-link-category-title {
-    font-size: 1.1rem;
-    margin: 1.8rem 0 0.8rem;
-    padding-left: 0.3rem;
-    font-weight: 600;
-}
-
-/* 第一个分类标题顶部间距调整 */
-.wp-native-link-category-title:first-of-type {
-    margin-top: 1rem;
-}
-
-/* 链接项基础样式（图标左、文字右） */
-.wp-native-link-item {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    gap: 12px;
-    width: 100%;
+    color: var(--link-text);
+    border-bottom: 2px solid var(--link-primary);
     position: relative;
-    box-sizing: border-box;
+    z-index: 1;
+    line-height: 1.4;
+    width: 100% !important;
+    text-align: center;
 }
 
-/* 核心 hover 样式 */
-.wp-native-link-item:hover {
-    color: #1890ff;
+.wp-native-link-category-title {
+    font-size: clamp(1rem, 4vw, 1.2rem);
+    margin: 1.5rem 0 0.8rem !important;
+    padding-left: 0.5rem !important;
+    font-weight: 600;
+    color: var(--link-text);
+    border-left: 3px solid var(--link-primary) !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    position: relative;
+    z-index: 1;
+    line-height: 1.4;
+    width: 100% !important;
+    text-align: left !important;
 }
 
-/* 图标容器（统一占位，确保有无Logo布局一致） */
+.wp-native-link-category-title:first-of-type {
+    margin-top: 0.8rem !important;
+}
+
+/* ===================== Logo容器（核心：放大+强制居中） ===================== */
 .wp-native-link-logo-container {
-    width: 50px;
-    height: 50px;
-    flex-shrink: 0;
-    border-radius: 4px;
-    padding: 4px;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-    background-color: #f5f5f5; /* 默认占位背景 */
+    /* Logo尺寸放大 */
+    width: var(--logo-size) !important;
+    height: var(--logo-size) !important;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--link-placeholder-bg);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    flex-grow: 0;
+    transition: all 0.3s ease;
+    /* 强制水平居中 - 核心 */
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
-/* 图标样式（左侧固定） */
-.wp-native-link-logo {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border: none;
+/* ===================== 链接项核心样式（宽度拉满） ===================== */
+.wp-native-link-item {
+    display: flex;
+    align-items: flex-start;
+    text-decoration: none;
+    color: var(--link-text);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 12px;
+    width: 100% !important;
+    max-width: 100% !important;
+    position: relative;
+    padding: 15px 12px !important;
+    border: 1px solid var(--link-border);
+    border-radius: var(--link-radius);
+    z-index: 0;
+    /* 增大最小高度，适配放大的Logo */
+    min-height: 90px;
+    overflow: hidden !important;
 }
 
+.wp-native-link-item:hover {
+    color: var(--link-primary);
+    background-color: #f9f9f9;
+    border-color: var(--link-hover);
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.1);
+}
 
-/* 文字内容区（右侧自适应） */
+.wp-native-link-item:hover .wp-native-link-logo-container {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    transform: scale(1.02); /* Logo hover轻微放大 */
+}
+
+.wp-native-link-item:hover .wp-native-link-logo {
+    transform: scale(1.05);
+}
+
+/* ===================== 文字内容区域（核心：描述单行隐藏+无描述占位） ===================== */
 .wp-native-link-content {
     flex-grow: 1;
-    width: calc(100% - 62px);
-    overflow: hidden;
+    flex-shrink: 1;
+    flex-basis: 0;
+    width: auto;
+    overflow: hidden !important;
+    padding: 2px 0;
 }
 
 .wp-native-link-name {
     font-weight: 600;
     display: block;
-    font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 0.1rem;
+    margin-bottom: 0.5rem; /* 增大间距，适配放大的Logo */
     transition: color 0.3s ease;
 }
 
+/* 核心1：描述强制单行，超出隐藏（取消多行） */
 .wp-native-link-desc {
-    font-size: 0.85rem;
-    margin-top: 0.2rem;
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.4;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    margin-top: 0;
+    display: block !important; /* 取消-webkit-box */
+    white-space: nowrap !important; /* 强制单行 */
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.5;
+    color: var(--link-desc);
     transition: color 0.3s ease;
+    max-height: 1.5em !important; /* 仅单行高度 */
+    width: 100%;
 }
 
-.wp-native-link-item:hover .wp-native-link-desc {
-    color: #40a9ff;
+/* 无描述时的占位样式（通过伪元素实现） */
+.wp-native-link-content:has(.wp-native-link-name:only-child)::after {
+    display: block;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    color: #999; /* 浅灰色占位 */
+    line-height: 1.5;
+    margin-top: 0.1rem;
 }
 
-/* 列表式布局 */
+/* 有描述时隐藏占位 */
+.wp-native-link-content:not(:has(.wp-native-link-name:only-child))::after {
+    display: none !important;
+}
+
+.wp-native-link-item:hover .wp-native-link-name {
+    color: var(--link-primary);
+}
+
+.wp-native-link-item:hover .wp-native-link-desc,
+.wp-native-link-item:hover .wp-native-link-content::after {
+    color: var(--link-hover);
+}
+
+/* ===================== 无Logo占位符（适配放大的尺寸） ===================== */
+.wp-native-link-logo-placeholder {
+    font-size: clamp(20px, 5vw, 24px); /* 放大占位符字体 */
+    color: #FFF;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 1px;
+    background: var(--link-placeholder-bg);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===================== 布局变体（核心：卡片布局Logo额外放大+全居中） ===================== */
+/* 列表式布局 - 适配放大的Logo */
 .wp-native-link-list {
     display: flex;
     flex-direction: column;
     gap: 0;
+    margin-top: var(--animation-space);
+    overflow: hidden !important;
 }
 
 .wp-native-link-list .wp-native-link-item {
-    padding: 0.8rem 0.5rem;
-    border-bottom: 1px dashed #eee;
-    border-top: 1px dashed transparent;
-    transition: all 0.3s ease;
-    margin: 0;
+    padding: 15px 10px !important;
+    border: none;
+    border-bottom: 1px dashed var(--link-border);
+    border-radius: 0;
+    background: transparent;
+    transform: none !important;
+    min-height: 90px;
+    align-items: flex-start !important;
 }
-
 
 .wp-native-link-list .wp-native-link-item:first-child {
-    border-top: 1px dashed #eee;
+    border-top: 1px dashed var(--link-border);
 }
 
-.wp-native-link-list .wp-native-link-item:last-child {
-    border-bottom: 1px dashed #eee;
+.wp-native-link-list .wp-native-link-item:hover {
+    background-color: #f0f7ff;
+    border-color: var(--link-hover);
+    transform: none !important;
+    box-shadow: none;
 }
 
-
-/* 网格式布局 */
+/* 网格式布局 - 适配放大的Logo */
 .wp-native-link-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.2rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important; /* 增大列宽适配Logo */
+    gap: var(--link-gap) !important;
+    margin-top: var(--animation-space);
+    overflow: hidden !important;
+    justify-items: stretch;
 }
 
 .wp-native-link-grid .wp-native-link-item {
-    padding: 1rem;
-    border: 1px solid #eee;
-    border-radius: 6px;
+    height: 100%;
+    padding: 18px 12px !important;
     flex-direction: row;
     text-align: left;
-    transition: all 0.3s ease;
-    height: 100%;
+    max-width: 380px !important; /* 增大最大宽度 */
+    align-items: flex-start !important;
+    min-height: 100px;
 }
 
-/* 卡片式布局 */
+.wp-native-link-grid .wp-native-link-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(24, 144, 255, 0.12);
+}
+
+/* 卡片式布局 - Logo额外放大+全居中 */
 .wp-native-link-card {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important; /* 增大列宽 */
+    gap: var(--link-gap) !important;
+    margin-top: var(--animation-space);
+    overflow: hidden !important;
+    justify-items: center;
 }
 
 .wp-native-link-card .wp-native-link-item {
-    padding: 1.2rem;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-    border: 1px solid #eee;
-    transition: all 0.3s ease;
+    padding: 1.8rem 1.2rem !important;
+    background: var(--link-bg);
+    border-radius: var(--link-card-radius);
+    box-shadow: var(--link-shadow);
     height: 100%;
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 15px; /* 增大间距，适配放大的Logo */
+    min-height: 140px;
+    align-items: center !important;
+    justify-content: center !important;
+    max-width: 420px !important; /* 增大最大宽度 */
 }
 
+/* 卡片式Logo额外放大 */
+.wp-native-link-card .wp-native-link-logo-container {
+    width: var(--logo-size-card) !important;
+    height: var(--logo-size-card) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-bottom: 8px !important;
+}
 
-/* 空状态样式 */
+/* 卡片式内容居中 + 占位适配 */
+.wp-native-link-card .wp-native-link-content {
+    width: 100%;
+    text-align: center !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.wp-native-link-card .wp-native-link-name:only-child {
+    margin: 0 auto !important;
+    text-align: center !important;
+    margin-bottom: 0.5rem !important; /* 为占位文本留空间 */
+}
+
+/* 卡片式描述单行 + 占位 */
+.wp-native-link-card .wp-native-link-desc {
+    text-align: center !important;
+    max-height: 1.5em !important;
+}
+
+.wp-native-link-card .wp-native-link-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(24, 144, 255, 0.15);
+}
+
+/* ===================== 空状态样式（适配放大的Logo） ===================== */
 .wp-native-link-empty {
     text-align: center;
-    padding: 2.5rem;
+    padding: 3rem 1.5rem !important;
     background: #f9f9f9;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    border: 1px dashed #eee;
+    border-radius: var(--link-card-radius);
+    font-size: clamp(0.9rem, 3vw, 1rem);
+    border: 1px dashed var(--link-border);
+    color: var(--link-desc);
+    transition: all 0.3s ease;
+    margin-top: var(--animation-space) !important;
+    line-height: 1.6;
+    overflow: hidden !important;
+    width: 100% !important;
+    min-height: 120px; /* 增大最小高度 */
 }
 
-/* 响应式适配 */
-@media (max-width: 1200px) {
+.wp-native-link-empty:hover {
+    background: #f0f7ff;
+    border-color: var(--link-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.1);
+}
+
+/* ===================== 响应式断点（适配不同尺寸Logo） ===================== */
+/* PC大屏适配（≥1200px） */
+@media (min-width: 1200px) {
     .wp-native-link-container {
-        padding: 0 1rem;
+        padding: var(--animation-space) 2rem 1.5rem !important;
+        margin: 1.5rem auto !important;
+        min-width: var(--pc-min-width) !important;
     }
-}
 
-@media (max-width: 768px) {
     .wp-native-link-grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
     }
+
     .wp-native-link-card {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)) !important;
+    }
+
+    .wp-native-link-main-title {
+        font-size: 1.5rem !important;
+        margin: 1.5rem 0 1.2rem !important;
+    }
+
+    .wp-native-link-category-title {
+        font-size: 1.2rem !important;
+        margin: 1.8rem 0 1rem !important;
+    }
+
+    .wp-native-link-item {
+        min-height: 100px;
     }
 }
 
-@media (max-width: 480px) {
+/* 平板适配（768px - 1199px） */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .wp-native-link-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+    }
+
+    .wp-native-link-card {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    }
+
+    .wp-native-link-container {
+        padding: var(--animation-space) 1.5rem 1rem !important;
+    }
+
+    .wp-native-link-item {
+        min-height: 95px;
+    }
+}
+
+/* 手机端核心适配（≤767px） */
+@media (max-width: 767px) {
+    :root {
+        --logo-size: var(--logo-size-mobile);
+        --logo-size-card: var(--logo-size-card-mobile);
+        --animation-space: 2px;
+        --link-gap: 1rem;
+    }
+
     .wp-native-link-grid,
     .wp-native-link-card {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
+        gap: var(--link-gap) !important;
     }
-    .wp-native-link-logo-container {
-        width: 45px;
-        height: 45px;
+
+    .wp-native-link-item {
+        padding: 15px 12px !important;
+        min-height: 85px !important;
     }
-    .wp-native-link-content {
-        width: calc(100% - 57px);
+
+    .wp-native-link-list .wp-native-link-item {
+        padding: 15px 10px !important;
+        min-height: 85px !important;
+        align-items: flex-start !important;
     }
+
+    .wp-native-link-card .wp-native-link-item {
+        padding: 1.5rem 1rem !important;
+        min-height: 130px !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .wp-native-link-empty {
+        padding: 2.5rem 1rem !important;
+        min-height: 110px !important;
+    }
+}
+
+/* 小屏手机（≤480px） */
+@media (max-width: 480px) {
+    .wp-native-link-container {
+        padding: var(--animation-space) 8px 1rem !important;
+    }
+
     .wp-native-link-main-title {
-        font-size: 1.2rem;
+        font-size: 1.2rem !important;
+        margin: 0.8rem 0 0.8rem !important;
+        padding-bottom: 0.4rem !important;
     }
+
     .wp-native-link-category-title {
-        font-size: 1rem;
+        font-size: 1rem !important;
+        margin: 1rem 0 0.6rem !important;
+        padding-left: 0.5rem !important;
+    }
+
+    .wp-native-link-item {
+        min-height: 80px !important;
+        gap: 10px !important;
+        padding: 12px 8px !important;
+    }
+
+    /* 小屏Logo轻微缩小 */
+    .wp-native-link-logo-container {
+        width: 60px !important;
+        height:60px !important;
+    }
+
+    .wp-native-link-card .wp-native-link-logo-container {
+        width: 46px !important;
+        height: 46px !important;
+    }
+
+    /* 小屏描述保持单行 */
+    .wp-native-link-desc {
+        font-size: 0.75rem !important;
+    }
+
+    .wp-native-link-content:has(.wp-native-link-name:only-child)::after {
+        font-size: 0.75rem !important;
     }
 }

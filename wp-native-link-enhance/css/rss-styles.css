@@ -1,0 +1,205 @@
+.link-rss-container ul{
+    padding-left: 0 !important;
+}
+
+/* 外层容器：控制整体宽度和居中 */
+.link-rss-container {
+    max-width: 800px; /* PC端最大宽度 */
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+/* 卡片列表：纵向单列布局 */
+.link-rss-aggregator {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* 卡片之间的纵向间距 */
+}
+
+/* 卡片主体：简洁白色卡片，轻微阴影 */
+.lra-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* 卡片hover效果：轻微阴影加深 */
+.lra-card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 卡片头部：Logo与文字高度对齐（核心布局） */
+.lra-header {
+    padding: 18px 20px;
+    display: flex;
+    align-items: center; /* 垂直居中对齐 */
+    border-bottom: 1px solid #f5f5f5;
+}
+
+/* 圆形Logo容器：高度=网站名称+日期总高度（关键修改） */
+.lra-avatar {
+    width: 48px; /* 与高度一致，保持圆形 */
+    height: 48px; /* 等于文字区域总高度（16px+13px+4px间距=33px？不，视觉对齐需稍大，48px更协调） */
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 7px;
+    flex-shrink: 0;
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Logo图片：填充容器，不拉伸 */
+.lra-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 无Logo占位：中文友好，居中显示 */
+.lra-avatar-placeholder {
+    background-color: #336699; /* 主色调：柔和蓝色 */
+}
+
+.lra-avatar-placeholder span {
+    color: #ffffff;
+    font-size: 20px; /* 随Logo尺寸放大，保持居中 */
+    font-weight: 600;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+/* 文字区域：网站名称+时间纵向堆叠（固定行高，便于计算总高度） */
+.lra-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* 名称与时间的纵向间距（替代margin-bottom） */
+}
+
+/* 来源名称：固定行高，配合Logo高度 */
+.lra-source {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4; /* 固定行高，确保高度稳定 */
+}
+
+.lra-source a {
+    color: #4299e1;
+    text-decoration: none;
+}
+
+.lra-source a:hover {
+    color: #3182ce;
+    text-decoration: underline;
+}
+
+/* 日期：固定行高，配合Logo高度 */
+.lra-date {
+    font-size: 13px;
+    color: #9ca3af;
+    line-height: 1.4; /* 固定行高 */
+    display: flex;
+    align-items: center;
+}
+
+/* 卡片内容区：标题+描述，适当内边距 */
+.lra-content {
+    padding: 20px;
+}
+
+/* 文章标题：黑色粗体，适中字号 */
+.lra-title {
+    margin: 0 0 15px 0;
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+.lra-title a {
+    color: #111827;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.lra-title a:hover {
+    color: #4299e1;
+    text-decoration: none;
+}
+
+/* 文章描述：灰色字体，限制行数，避免过长 */
+.lra-description {
+    color: #4b5563;
+    font-size: 15px;
+    line-height: 1.7;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* 最多显示3行 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 错误提示：与卡片风格统一 */
+.lra-error {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+/* 响应式调整：适配移动端 */
+@media (max-width: 768px) {
+    .link-rss-container {
+        max-width: 100%; /* 移动端全屏宽度 */
+        margin: 15px auto;
+        padding: 0 0px;
+    }
+
+    .lra-aggregator {
+        gap: 12px;
+    }
+
+    .lra-header {
+        padding: 15px 18px;
+    }
+
+    /* 移动端Logo尺寸同步缩小 */
+    .lra-avatar {
+        width: 40px;
+        height: 40px;
+        margin-right: 5px;
+    }
+
+    .lra-avatar-placeholder span {
+        font-size: 18px;
+    }
+
+    .lra-content {
+        padding: 18px;
+    }
+
+    .lra-title {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    .lra-description {
+        font-size: 14px;
+        -webkit-line-clamp: 2; /* 移动端显示2行描述 */
+    }
+
+    .lra-source {
+        font-size: 15px;
+    }
+
+    .lra-date {
+        font-size: 12px;
+    }
+}
