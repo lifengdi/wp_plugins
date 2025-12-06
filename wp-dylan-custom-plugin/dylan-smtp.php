@@ -125,7 +125,7 @@ function comment_reply_email_notification( $comment_ID, $comment_approved = null
                          width="32" height="32">
                 </div>
                 <div class="comment-bubble">
-                    '. nl2br( esc_html( $parent_comment->comment_content ) ) .'
+                    '. process_emoji_in_comment( $parent_comment->comment_content ) .'
                 </div>
             </div>
 
@@ -140,7 +140,7 @@ function comment_reply_email_notification( $comment_ID, $comment_approved = null
                     <div class="comment-author">'. esc_html($comment->comment_author) .'</div>
                 </div>
                 <div class="comment-bubble">
-                    '. nl2br( esc_html( $comment->comment_content ) ) .'
+                    '. process_emoji_in_comment( $comment->comment_content ) .'
                 </div>
             </div>
         </div>
