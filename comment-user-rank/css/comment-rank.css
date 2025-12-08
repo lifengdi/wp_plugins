@@ -314,3 +314,338 @@
     width: 100%;
     text-align: center;
 }
+
+
+/* 评论等级排行榜样式 - 独立文件（优化Top3样式+单行布局） */
+.comment-rank-top {
+    margin: auto;
+}
+
+.rank-top-title {
+    text-align: center;
+    font-size: 1.8em;
+    margin: 0 0 25px;
+    color: #2d3748;
+    font-weight: 600;
+    /* 标题增加渐变文字效果 */
+    background: linear-gradient(135deg, #ff9800 0%, #2196f3 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* 多列Flex容器 - 新增justify-content，单行时居中不拉伸 */
+.rank-top-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    --gap: 18px; /* 间距变量 */
+    justify-content: center; /* 单行时卡片居中，不占满整行 */
+}
+
+/* 卡片基础样式 - 修改flex属性，单行时不强制拉伸 */
+.rank-top-card {
+    flex: 0 0 auto; /* 取消拉伸，保持固定宽度 */
+    width: calc((100% - (var(--columns) - 1) * var(--gap)) / var(--columns)); /* 多列时均匀分布 */
+    min-width: 200px; /* 最小宽度，避免过窄 */
+    position: relative;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* 单行时（--columns:1）强制设置卡片宽度，不占满整行 */
+.rank-top-flex[style*="--columns: 1"] .rank-top-card {
+    width: 280px !important; /* 单行时固定宽度，按原有样式展示 */
+    margin: 0 10px 18px; /* 左右间距，居中效果更优 */
+}
+
+/* Top1 专属炫酷样式 */
+.rank-top-card.rank-card-1st {
+    background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+    border: 2px solid #ffc107;
+    /* 金色光晕效果 */
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.3), 0 2px 8px rgba(0,0,0,0.06);
+    transform: translateY(-5px); /* 默认上浮5px，突出显示 */
+}
+
+/* Top2 专属炫酷样式 */
+.rank-top-card.rank-card-2nd {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    border: 2px solid #9e9e9e;
+    /* 银色光晕效果 */
+    box-shadow: 0 0 20px rgba(158, 158, 158, 0.3), 0 2px 8px rgba(0,0,0,0.06);
+    transform: translateY(-3px); /* 默认上浮3px */
+}
+
+/* Top3 专属炫酷样式 */
+.rank-top-card.rank-card-3rd {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    border: 2px solid #ff8a65;
+    /* 铜色光晕效果 */
+    box-shadow: 0 0 20px rgba(255, 138, 101, 0.3), 0 2px 8px rgba(0,0,0,0.06);
+    transform: translateY(-2px); /* 默认上浮2px */
+}
+
+/* 卡片hover效果 - Top3额外增强 */
+.rank-top-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+}
+.rank-top-card.rank-card-1st:hover {
+    box-shadow: 0 0 30px rgba(255, 193, 7, 0.5), 0 12px 20px rgba(0,0,0,0.15);
+    transform: translateY(-10px);
+}
+.rank-top-card.rank-card-2nd:hover {
+    box-shadow: 0 0 30px rgba(158, 158, 158, 0.5), 0 12px 20px rgba(0,0,0,0.15);
+    transform: translateY(-8px);
+}
+.rank-top-card.rank-card-3rd:hover {
+    box-shadow: 0 0 30px rgba(255, 138, 101, 0.5), 0 12px 20px rgba(0,0,0,0.15);
+    transform: translateY(-7px);
+}
+
+.rank-top-card-inner {
+    padding: 25px 20px;
+    margin-top: 20px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* 头像容器 - Top3增加专属边框 */
+.rank-top-avatar-wrap {
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #f0f4f8;
+    /* 头像呼吸动画 */
+    animation: avatarPulse 3s infinite ease-in-out;
+}
+.rank-card-1st .rank-top-avatar-wrap {
+    border: 4px solid #ffc107;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+}
+.rank-card-2nd .rank-top-avatar-wrap {
+    border: 4px solid #9e9e9e;
+    box-shadow: 0 0 15px rgba(158, 158, 158, 0.4);
+}
+.rank-card-3rd .rank-top-avatar-wrap {
+    border: 4px solid #ff8a65;
+    box-shadow: 0 0 15px rgba(255, 138, 101, 0.4);
+}
+
+.rank-top-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 文字样式 - Top3增加颜色强调 */
+.rank-top-name {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 10px;
+    line-height: 1.3;
+    position: relative;
+}
+/* Top1-3用户名下方添加专属装饰线 */
+.rank-card-1st .rank-top-name::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #ffc107;
+    margin: 8px auto 0;
+    border-radius: 3px;
+}
+.rank-card-2nd .rank-top-name::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #9e9e9e;
+    margin: 8px auto 0;
+    border-radius: 3px;
+}
+.rank-card-3rd .rank-top-name::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: #ff8a65;
+    margin: 8px auto 0;
+    border-radius: 3px;
+}
+
+.rank-top-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+/* 等级标签 - Top3增强样式 */
+.comment-user-rank {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #fff;
+}
+.rank-card-1st .comment-user-rank {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    box-shadow: 0 2px 6px rgba(255, 152, 0, 0.3);
+}
+.rank-card-2nd .comment-user-rank {
+    background: linear-gradient(135deg, #e0e0e0 0%, #9e9e9e 100%);
+    box-shadow: 0 2px 6px rgba(158, 158, 158, 0.3);
+}
+.rank-card-3rd .comment-user-rank {
+    background: linear-gradient(135deg, #ffccbc 0%, #ff8a65 100%);
+    box-shadow: 0 2px 6px rgba(255, 138, 101, 0.3);
+}
+
+/* 评论数 - Top3增加数字高亮 */
+.rank-top-count {
+    color: #718096;
+    font-weight: 500;
+}
+.rank-card-1st .rank-top-count {
+    color: #ff9800;
+    font-size: 1.05em;
+}
+.rank-card-2nd .rank-top-count {
+    color: #9e9e9e;
+    font-size: 1.05em;
+}
+.rank-card-3rd .rank-top-count {
+    color: #ff8a65;
+    font-size: 1.05em;
+}
+
+/* 排名角标 - 增强视觉效果 */
+.rank-top-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 6px 0;
+    font-size: 0.9em;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    margin: 0;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.rank-1st {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    background-repeat: no-repeat;
+}
+.rank-2nd {
+    background: linear-gradient(135deg, #e0e0e0 0%, #9e9e9e 100%);
+    background-repeat: no-repeat;
+}
+.rank-3rd {
+    background: linear-gradient(135deg, #ffccbc 0%, #ff8a65 100%);
+    background-repeat: no-repeat;
+}
+.rank-top-badge:not(.rank-1st):not(.rank-2nd):not(.rank-3rd) {
+    background: linear-gradient(135deg, #64b5f6 0%, #2196f3 100%);
+}
+
+/* 无数据提示 */
+.rank-top-empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: #718096;
+    font-size: 1.1em;
+    line-height: 1.6;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* 头像呼吸动画 */
+@keyframes avatarPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(99, 181, 246, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(99, 181, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(99, 181, 246, 0);
+    }
+}
+/* Top1-3头像动画增强 */
+.rank-card-1st .rank-top-avatar-wrap {
+    animation: avatarPulseGold 3s infinite ease-in-out;
+}
+.rank-card-2nd .rank-top-avatar-wrap {
+    animation: avatarPulseSilver 3s infinite ease-in-out;
+}
+.rank-card-3rd .rank-top-avatar-wrap {
+    animation: avatarPulseBronze 3s infinite ease-in-out;
+}
+@keyframes avatarPulseGold {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 12px rgba(255, 193, 7, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+    }
+}
+@keyframes avatarPulseSilver {
+    0% {
+        box-shadow: 0 0 0 0 rgba(158, 158, 158, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 12px rgba(158, 158, 158, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(158, 158, 158, 0);
+    }
+}
+@keyframes avatarPulseBronze {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 138, 101, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 12px rgba(255, 138, 101, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 138, 101, 0);
+    }
+}
+
+/* 响应式适配 */
+@media (max-width: 992px) {
+    .rank-top-flex {--columns: 2;} /* 平板2列 */
+    .rank-top-card {
+        width: calc((100% - var(--gap)) / 2); /* 2列时均匀分布 */
+    }
+}
+
+@media (max-width: 576px) {
+    .rank-top-flex {--columns: 1;} /* 手机1列 */
+    .rank-top-card {
+        width: 300px !important; /* 手机端单行固定宽度 */
+    }
+    .rank-top-title {
+        font-size: 1.5em;
+    }
+}
