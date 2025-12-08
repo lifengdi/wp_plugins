@@ -352,7 +352,7 @@
     width: calc((100% - (var(--columns) - 1) * var(--gap)) / var(--columns)); /* 多列时均匀分布 */
     min-width: 200px; /* 最小宽度，避免过窄 */
     position: relative;
-    background: #fff;
+    background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     overflow: hidden;
@@ -366,7 +366,7 @@
     margin: 0 10px 18px; /* 左右间距，居中效果更优 */
 }
 
-/* Top1 专属炫酷样式 */
+/* Top1 专属炫酷样式 - 新增名称+排名颜色 */
 .rank-top-card.rank-card-1st {
     background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
     border: 2px solid #ffc107;
@@ -374,8 +374,26 @@
     box-shadow: 0 0 20px rgba(255, 193, 7, 0.3), 0 2px 8px rgba(0,0,0,0.06);
     transform: translateY(-5px); /* 默认上浮5px，突出显示 */
 }
+/* Top1 用户名颜色高亮 */
+.rank-card-1st .rank-top-name {
+    color: #e65100 !important; /* 深金色，醒目突出 */
+    font-size: 1.3em !important; /* 略放大，增强层级 */
+    text-shadow: 0 1px 3px rgba(255, 193, 7, 0.2); /* 轻微发光效果 */
+}
+.rank-card-1st .rank-top-name a {
+    color: #e65100 !important; /* 深金色，醒目突出 */
+    font-size: 1.3em !important; /* 略放大，增强层级 */
+    text-shadow: 0 1px 3px rgba(255, 193, 7, 0.2); /* 轻微发光效果 */
+}
+/* Top1 排名角标颜色增强 */
+.rank-card-1st .rank-top-badge {
+    background: linear-gradient(135deg, #ffb300 0%, #ff8f00 100%) !important;
+    color: #fff8e1 !important; /* 暖白色文字，更搭金色背景 */
+    font-size: 0.95em !important;
+    padding: 7px 0 !important; /* 增加内边距，更饱满 */
+}
 
-/* Top2 专属炫酷样式 */
+/* Top2 专属炫酷样式 - 新增名称+排名颜色 */
 .rank-top-card.rank-card-2nd {
     background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
     border: 2px solid #9e9e9e;
@@ -383,14 +401,50 @@
     box-shadow: 0 0 20px rgba(158, 158, 158, 0.3), 0 2px 8px rgba(0,0,0,0.06);
     transform: translateY(-3px); /* 默认上浮3px */
 }
+/* Top2 用户名颜色高亮 */
+.rank-card-2nd .rank-top-name {
+    color: #424242 !important; /* 深灰色，体现银色质感 */
+    font-size: 1.25em !important; /* 略放大 */
+    text-shadow: 0 1px 3px rgba(158, 158, 158, 0.2);
+}
+.rank-card-2nd .rank-top-name a {
+    color: #424242 !important; /* 深灰色，体现银色质感 */
+    font-size: 1.25em !important; /* 略放大 */
+    text-shadow: 0 1px 3px rgba(158, 158, 158, 0.2);
+}
+/* Top2 排名角标颜色增强 */
+.rank-card-2nd .rank-top-badge {
+    background: linear-gradient(135deg, #bdbdbd 0%, #757575 100%) !important;
+    color: #fafafa !important; /* 纯白色文字，更搭银色背景 */
+    font-size: 0.95em !important;
+    padding: 7px 0 !important;
+}
 
-/* Top3 专属炫酷样式 */
+/* Top3 专属炫酷样式 - 新增名称+排名颜色 */
 .rank-top-card.rank-card-3rd {
     background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
     border: 2px solid #ff8a65;
     /* 铜色光晕效果 */
     box-shadow: 0 0 20px rgba(255, 138, 101, 0.3), 0 2px 8px rgba(0,0,0,0.06);
     transform: translateY(-2px); /* 默认上浮2px */
+}
+/* Top3 用户名颜色高亮 */
+.rank-card-3rd .rank-top-name {
+    color: #d84315 !important; /* 铜红色，突出铜色质感 */
+    font-size: 1.25em !important; /* 略放大 */
+    text-shadow: 0 1px 3px rgba(255, 138, 101, 0.2);
+}
+.rank-card-3rd .rank-top-name a {
+    color: #d84315 !important; /* 铜红色，突出铜色质感 */
+    font-size: 1.25em !important; /* 略放大 */
+    text-shadow: 0 1px 3px rgba(255, 138, 101, 0.2);
+}
+/* Top3 排名角标颜色增强 */
+.rank-card-3rd .rank-top-badge {
+    background: linear-gradient(135deg, #ffab91 0%, #e64a19 100%) !important;
+    color: #fff8e1 !important; /* 暖白色文字，更搭铜色背景 */
+    font-size: 0.95em !important;
+    padding: 7px 0 !important;
 }
 
 /* 卡片hover效果 - Top3额外增强 */
@@ -561,7 +615,9 @@
     background-repeat: no-repeat;
 }
 .rank-top-badge:not(.rank-1st):not(.rank-2nd):not(.rank-3rd) {
-    background: linear-gradient(135deg, #64b5f6 0%, #2196f3 100%);
+    background: linear-gradient(135deg, #d7ccc8 0%, #8d6e63 100%); /* 浅茶→褐棕，暖调复古 */
+    color: #f5f5dc !important; /* 象牙白，非纯白，带暖感 */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 /* 无数据提示 */
@@ -638,6 +694,14 @@
     .rank-top-card {
         width: calc((100% - var(--gap)) / 2); /* 2列时均匀分布 */
     }
+    /* 移动端Top3名称大小适配 */
+    .rank-card-1st .rank-top-name {
+        font-size: 1.2em !important;
+    }
+    .rank-card-2nd .rank-top-name,
+    .rank-card-3rd .rank-top-name {
+        font-size: 1.15em !important;
+    }
 }
 
 @media (max-width: 576px) {
@@ -647,5 +711,13 @@
     }
     .rank-top-title {
         font-size: 1.5em;
+    }
+    /* 移动端Top3名称大小适配 */
+    .rank-card-1st .rank-top-name {
+        font-size: 1.2em !important;
+    }
+    .rank-card-2nd .rank-top-name,
+    .rank-card-3rd .rank-top-name {
+        font-size: 1.15em !important;
     }
 }
