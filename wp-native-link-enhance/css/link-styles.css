@@ -89,7 +89,6 @@
     height: var(--logo-size) !important;
     border-radius: 50%;
     overflow: hidden;
-    background: var(--link-placeholder-bg);
     display: flex;
     align-items: center;
     justify-content: center;
