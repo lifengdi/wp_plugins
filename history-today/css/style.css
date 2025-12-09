@@ -1,0 +1,85 @@
+/* 历史上的今天样式 */
+.history-today-wrapper {
+    /*max-width: 800px;*/
+    /*margin: 20px auto;*/
+    /*padding: 20px;*/
+    /*background: #f9f9f9;*/
+    /*border-radius: 8px;*/
+    /*box-shadow: 0 2px 4px rgba(0,0,0,0.1);*/
+}
+
+.history-today-title {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+}
+
+.history-today-cn, .history-today-foreign {
+    margin-bottom: 20px;
+}
+
+.history-today-cn h4, .history-today-foreign h4 {
+    color: #3498db;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.history-today-cn h4::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 20px;
+    background: #e74c3c;
+    margin-right: 8px;
+}
+
+.history-today-foreign h4::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 20px;
+    background: #2ecc71;
+    margin-right: 8px;
+}
+
+.history-today-wrapper ul {
+    list-style: none;
+    padding-left: 12px;
+}
+
+.history-today-wrapper li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+    color: #333;
+    line-height: 1.6;
+}
+
+.history-today-wrapper li strong {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.history-today-empty {
+    color: #7f8c8d;
+    text-align: center;
+    padding: 20px;
+    font-size: 1rem;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+    .history-today-wrapper {
+        padding: 15px;
+        margin: 10px;
+    }
+    .history-today-title {
+        font-size: 1.3rem;
+    }
+    .history-today-cn h4, .history-today-foreign h4 {
+        font-size: 1.1rem;
+    }
+}
