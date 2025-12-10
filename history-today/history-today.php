@@ -38,6 +38,19 @@ function ht_register_event_detail_api() {
 }
 add_action('rest_api_init', 'ht_register_event_detail_api');
 
+function ht_clean_br_tags($content) {
+    $content = preg_replace('/<br>\s*<h[123456789]>/i', '<h$1>', $content); // h标签前的<br>
+    $content = preg_replace('/<\/h[123456789]>\s*<br>/i', '</h$1>', $content); // h标签后的<br>
+    // 1. 移除<p>开头/结尾的<br>（最核心：避免段落首尾空行）
+    $content = preg_replace('/<p>\s*<br>/i', '<p>', $content);
+    $content = preg_replace('/<br>\s*<\/p>/i', '</p>', $content);
+    // 2. 移除连续<br>（保留1个即可）
+    $content = preg_replace('/(<br>\s*){2,}/i', '<br>', $content);
+    // 3. 移除空标签
+    $content = preg_replace('/<p>\s*<\/p>/i', '', $content);
+    $content = preg_replace('/<li>\s*<\/li>/i', '', $content);
+    return $content;
+}
 /**
  * 核心：Markdown转HTML（轻量级，处理常见标签）
  * @param string $md 原始Markdown内容
@@ -69,6 +82,8 @@ function ht_markdown_to_html($md) {
     $md = preg_replace('/\n{2,}/', '</p><p>', $md); // 空行分隔段落
     $md = preg_replace('/\n/', '<br>', $md); // 单换行
     $md = '<p>' . $md . '</p>'; // 包裹段落
+
+    $md = ht_clean_br_tags($md);
 
     return $md;
 }
