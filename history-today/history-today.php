@@ -39,6 +39,41 @@ function ht_register_event_detail_api() {
 add_action('rest_api_init', 'ht_register_event_detail_api');
 
 /**
+ * 核心：Markdown转HTML（轻量级，处理常见标签）
+ * @param string $md 原始Markdown内容
+ * @return string 解析后的HTML
+ */
+function ht_markdown_to_html($md) {
+    if (empty($md)) return '';
+
+    // 2. 块级元素处理
+    // 无序列表（- 开头）
+    $md = preg_replace_callback('/^(\s*)- (.*)$/m', function($matches) {
+        return $matches[1] . '<li>' . $matches[2] . '</li>';
+    }, $md);
+    // 包裹列表项为<ul>
+    $md = preg_replace('/(<li>.*<\/li>)/s', '<ul>$1</ul>', $md);
+
+    // 标题（#/## 开头，降级为h4/h5避免破坏页面结构）
+    $md = preg_replace('/^## (.*)$/m', '<h4>$1</h4>', $md);
+    $md = preg_replace('/^# (.*)$/m', '<h3>$1</h3>', $md);
+
+    // 3. 行内元素处理
+    $md = preg_replace('/\*\*(.*?)\*\*/', '<strong>$1</strong>', $md); // 加粗
+    $md = preg_replace('/\*(.*?)\*/', '<em>$1</em>', $md); // 斜体
+    $md = preg_replace('/`(.*?)`/', '<code>$1</code>', $md); // 行内代码
+    // 链接 [文本](链接) → <a>
+    $md = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2" target="_blank">$1</a>', $md);
+
+    // 4. 换行处理（保留单换行，合并多换行）
+    $md = preg_replace('/\n{2,}/', '</p><p>', $md); // 空行分隔段落
+    $md = preg_replace('/\n/', '<br>', $md); // 单换行
+    $md = '<p>' . $md . '</p>'; // 包裹段落
+
+    return $md;
+}
+
+/**
  * API回调函数：查询事件详情
  */
 function ht_get_event_detail_api_callback($request) {
@@ -139,7 +174,9 @@ function ht_process_events($events, $atts) {
 function ht_safe_rich_text($content) {
     if (empty($content)) return '';
 
-    return $content;
+	$html = ht_markdown_to_html($content);
+
+    return $html;
 }
 
 /**
