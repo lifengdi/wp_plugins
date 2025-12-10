@@ -70,7 +70,101 @@
     font-size: 1rem;
 }
 
-/* 响应式适配 */
+/* ========== 新增：描述相关样式（与原有风格统一） ========== */
+/* 随机数量提示 */
+.history-today-count {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    margin: 0 0 15px 0;
+    padding: 8px 12px;
+    background: #f5f7fa;
+    border-radius: 6px;
+    border-left: 3px solid #3498db;
+}
+
+/* 事件项容器（增强层级） */
+.history-today-event-item {
+    position: relative;
+    padding-left: 4px;
+}
+
+/* 描述展开/收起按钮（核心优化） */
+.ht-desc-toggle {
+    margin-left: 10px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    border: none; /* 去掉默认边框 */
+    border-radius: 20px; /* 全圆角，更精致 */
+    background-color: #3498db; /* 主色填充，更醒目 */
+    color: #fff; /* 文字白色 */
+    cursor: pointer;
+    transition: all 0.3s ease; /* 慢一点的过渡，更丝滑 */
+    outline: none;
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2); /* 轻微阴影，增加立体感 */
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* hover状态：加深背景+放大阴影+轻微缩放 */
+.ht-desc-toggle:hover {
+    background-color: #2980b9; /* 更深的蓝色 */
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+    transform: translateY(-1px); /* 轻微上移，有悬浮感 */
+}
+
+/* 点击/激活状态：按压效果 */
+.ht-desc-toggle:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
+    background-color: #1f618d;
+}
+.desc-content{
+    padding: 5px 12px;
+}
+
+/* 描述内容通用样式 */
+.event-desc {
+    border-radius: 6px;
+    background: #f5f7fa;
+    line-height: 1.7;
+    border-left: 3px solid #95a5a6;
+}
+
+/* 折叠描述默认隐藏 + 平滑过渡（替代原display:none） */
+.fold-desc {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.fold-desc.active {
+    max-height: 2000px; /* 足够大的数值容纳内容 */
+    opacity: 1;
+    animation: fadeIn 0.3s ease;
+    margin-top: 10px;
+}
+
+/* 直接显示的描述样式（与折叠展开样式统一） */
+.show-desc {
+    display: block;
+    margin-top: 10px;
+}
+
+/* 描述内容动画 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== 响应式适配（同步新增样式） ========== */
 @media (max-width: 768px) {
     .history-today-wrapper {
         padding: 15px;
@@ -81,5 +175,22 @@
     }
     .history-today-cn h4, .history-today-foreign h4 {
         font-size: 1.1rem;
+    }
+
+    /* 新增响应式适配 */
+    .history-today-count {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+    /* 移动端按钮更紧凑 */
+    .ht-desc-toggle {
+        padding: 3px 10px;
+        font-size: 0.8rem;
+        border-radius: 18px;
+    }
+    .event-desc {
+        margin-left: 10px;
+        padding: 8px 10px;
+        font-size: 0.9rem;
     }
 }
