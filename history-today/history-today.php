@@ -276,7 +276,7 @@ function ht_history_today_shortcode($atts) {
         // 左下角显示查看更多按钮
         if ($atts['show_more_link']) {
             $html .= '<li class="history-today-event-item">';
-                $html .= '<a style="justify-content: flex-end;display: flex;" target="_blank" href="'.$atts['show_more_link'].'">查看更多</a>';
+                $html .= '<a style="justify-content: flex-end;display: flex;" target="_blank" href="'.$atts['show_more_link'].'">更多历史事件</a>';
             $html .= '</li>';
         }
 
