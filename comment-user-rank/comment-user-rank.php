@@ -178,6 +178,9 @@ add_action('init', 'init_widget_render_flag');
 function cur_add_tags_to_author_link($author_link, $author, $comment_id) {
     $comment = get_comment($comment_id);
     if (!$comment) return $author_link;
+    if (is_admin()) {
+            return $author_link;
+        }
 
     // 管理员显示「管理」标签
     if (cur_is_admin_comment($comment)) {
