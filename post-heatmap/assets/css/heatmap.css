@@ -1,10 +1,10 @@
-/* 核心容器 */
+/* 核心容器样式 */
 .ph-heatmap-container {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #24292e;
     margin: 20px 0;
     width: 100%;
-    overflow-x: auto;
+    overflow-x: auto; /* 适配小屏幕横向滚动 */
 }
 
 /* 热力图标题 */
@@ -15,153 +15,163 @@
     color: #24292e;
 }
 
-/* 整体布局（星期列 + 内容区，彻底分离） */
-.ph-heatmap-wrap {
-    display: flex !important;
-    align-items: flex-start !important;
+/* GitHub 风格热力图核心样式 */
+.ph-heatmap {
+    display: block;
+    user-select: none;
+    position: relative;
 }
 
-/* 星期列（核心：固定宽度，独立列，不与任何元素重叠） */
-.ph-heatmap-weekdays-col {
-    width: 25px !important; /* 固定宽度 */
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 2px !important;
-    margin-right: 5px !important;
+/* 星期标签列（核心：固定宽度，不与月份重叠） */
+.ph-heatmap-weekdays {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 20px; /* 固定宽度，确保周日列独立 */
+    margin-top: 17px;
 }
 
-/* 星期标签项（精准对齐单元格行） */
-.ph-heatmap-weekday-item {
-    width: 13px !important;
-    height: 13px !important;
-    font-size: 10px !important;
-    line-height: 13px !important;
-    text-align: center !important;
-    color: #7d8590 !important;
-    margin: 0 auto !important;
+.ph-heatmap-weekday {
+    width: 13px;
+    height: 13px;
+    font-size: 10px;
+    line-height: 13px;
+    text-align: center;
+    color: #7d8590;
+    margin: 0 auto;
 }
 
-/* 内容区（月份 + 网格，与星期列并排） */
-.ph-heatmap-content-area {
-    position: relative !important;
-    flex: 1 !important;
+/* 主内容区（月份+网格） */
+.ph-heatmap-main {
+    position: relative; /* 为月份标签绝对定位做准备 */
 }
 
-/* 月份标签容器（绝对定位，不影响网格） */
-.ph-heatmap-months-wrap {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 16px !important;
-    pointer-events: none !important;
+/* 月份标签行（核心优化：绝对定位，不占用网格空间，避免与周日列重叠） */
+.ph-heatmap-months {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 16px;
+    pointer-events: none; /* 不影响单元格hover */
 }
 
-/* 月份标签项（YYYY-MM格式，精准定位） */
-.ph-heatmap-month-item {
-    position: absolute !important;
-    font-size: 11px !important;
-    color: #7d8590 !important;
-    transform: translateX(-50%) !important; /* 居中对齐 */
+.ph-heatmap-month {
+    position: absolute; /* 精准定位到对应周数 */
+    font-size: 11px;
+    color: #7d8590;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateX(-50%); /* 居中对齐 */
 }
 
-/* 单元格网格（核心：7行×N列，严格对齐星期列） */
-.ph-heatmap-cells-grid {
-    display: grid !important;
-    gap: 2px !important;
+/* 热力图网格（核心修复：7行×N列，周日严格对齐第一列） */
+.ph-heatmap-grid {
+    display: grid;
+    gap: 2px;
 }
 
-/* 单元格样式 */
+/* 热力图单元格（核心） */
 .ph-heatmap-cell {
-    width: 13px !important;
-    height: 13px !important;
-    border-radius: 2px !important;
-    background-color: #ebedf0 !important;
-    transition: background-color 0.2s ease !important;
+    width: 13px;
+    height: 13px;
+    border-radius: 2px;
+    background-color: #ebedf0;
+    transition: background-color 0.2s ease;
+    position: relative;
 }
 
-/* 颜色梯度（GitHub原版） */
-.ph-heatmap-cell.level-1 { background-color: #c6e48b !important; }
-.ph-heatmap-cell.level-2 { background-color: #7bc96f !important; }
-.ph-heatmap-cell.level-3 { background-color: #239a3b !important; }
-.ph-heatmap-cell.level-4 { background-color: #196127 !important; }
+/* GitHub 颜色梯度（0-4级） */
+.ph-heatmap-cell.level-1 { background-color: #c6e48b; }
+.ph-heatmap-cell.level-2 { background-color: #7bc96f; }
+.ph-heatmap-cell.level-3 { background-color: #239a3b; }
+.ph-heatmap-cell.level-4 { background-color: #196127; }
 
-/* 未来日期单元格（浅灰色） */
+.ph-heatmap-legend-color.level-0 { background-color: #ebedf0 !important; }
+.ph-heatmap-legend-color.level-1 { background-color: #c6e48b !important; }
+.ph-heatmap-legend-color.level-2 { background-color: #7bc96f !important; }
+.ph-heatmap-legend-color.level-3 { background-color: #239a3b !important; }
+.ph-heatmap-legend-color.level-4 { background-color: #196127 !important; }
+
+
+/* 未来日期单元格样式（可选） */
 .ph-heatmap-cell[data-is-future="true"] {
-    background-color: #f8f8f8 !important;
-    opacity: 0.6 !important;
+    background-color: #f0f0f0;
+    opacity: 0.7;
 }
 
-/* 单元格hover效果 */
+/* 悬停效果 */
 .ph-heatmap-cell:hover {
-    outline: 1px solid #24292e !important;
-    outline-offset: -1px !important;
-    cursor: pointer !important;
+    outline: 1px solid #24292e;
+    outline-offset: -1px;
+    cursor: pointer;
 }
 
-/* Tooltip样式（GitHub同款） */
+/* Tooltip 样式（GitHub 同款，优化层级） */
 .ph-heatmap-tooltip {
-    position: absolute !important;
-    z-index: 99999 !important;
-    padding: 8px 10px !important;
-    background: #24292e !important;
-    color: #fff !important;
-    font-size: 12px !important;
-    border-radius: 3px !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-    pointer-events: none !important;
-    opacity: 0 !important;
-    transition: opacity 0.2s ease !important;
-    white-space: nowrap !important;
+    position: absolute;
+    z-index: 99999; /* 提高层级，避免被遮挡 */
+    padding: 8px 10px;
+    background: #24292e;
+    color: #fff;
+    font-size: 12px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
 }
 
 /* 图例样式 */
 .ph-heatmap-legend {
-    display: flex !important;
-    align-items: center !important;
-    font-size: 11px !important;
-    color: #7d8590 !important;
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+    font-size: 11px;
+    color: #7d8590;
+    margin-left: 28px; /* 对齐网格 */
 }
 
-.ph-legend-label {
-    margin: 0 8px !important;
+.ph-heatmap-legend-label {
+    margin: 0 8px;
 }
 
-.ph-legend-colors {
-    display: flex !important;
-    gap: 2px !important;
+.ph-heatmap-legend-colors {
+    display: flex;
+    gap: 2px;
 }
 
-.ph-legend-color {
-    width: 13px !important;
-    height: 13px !important;
-    border-radius: 2px !important;
+.ph-heatmap-legend-color {
+    width: 13px;
+    height: 13px;
+    border-radius: 2px;
 }
-
-.ph-legend-color.level-0 { background-color: #ebedf0 !important; }
-.ph-legend-color.level-1 { background-color: #c6e48b !important; }
-.ph-legend-color.level-2 { background-color: #7bc96f !important; }
-.ph-legend-color.level-3 { background-color: #239a3b !important; }
-.ph-legend-color.level-4 { background-color: #196127 !important; }
 
 /* 响应式适配 */
 @media (max-width: 768px) {
-    .ph-heatmap-weekday-item,
     .ph-heatmap-cell,
-    .ph-legend-color {
-        width: 10px !important;
-        height: 10px !important;
+    .ph-heatmap-legend-color,
+    .ph-heatmap-weekday {
+        width: 10px;
+        height: 10px;
     }
 
-    .ph-heatmap-cells-grid {
-        gap: 1px !important;
+    .ph-heatmap-grid {
+        gap: 1px;
     }
 
-    .ph-heatmap-month-item {
-        font-size: 10px !important;
+    .ph-heatmap-title {
+        font-size: 14px;
+    }
+
+    .ph-heatmap-month {
+        font-size: 10px;
     }
 
     .ph-heatmap-legend {
-        margin-left: 25px !important;
+        margin-left: 25px;
     }
 }
