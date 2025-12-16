@@ -5,44 +5,106 @@ jQuery(document).ready(function($) {
     $('.ph-heatmap').each(function() {
         const $heatmap = $(this);
         const heatmapId = $heatmap.attr('id');
-
-        // 获取隐藏的热力图数据
         const $dataEl = $(`.ph-heatmap-data-${heatmapId}`);
         const heatmapConfig = JSON.parse($dataEl.html());
-        const heatmapData = heatmapConfig.data;
-        const timeRange = heatmapConfig.time_range;
 
-        // 渲染热力图
-        renderPostHeatmap($heatmap, heatmapData, timeRange);
+        // 关键修复：确保传递stats参数
+        renderPostHeatmap(
+            $heatmap,
+            heatmapConfig.data,
+            heatmapConfig.stats, // 传递统计信息
+            heatmapConfig.year,
+            heatmapConfig.time_range
+        );
     });
 
     /**
-     * 渲染 GitHub 风格热力图（优化对齐+日期格式+未来日期tooltip）
-     * @param {jQuery} $container 容器元素
+     * 年份选择器切换事件
+     */
+    $(document).on('change', '.ph-year-select', function() {
+        const $select = $(this);
+        const heatmapId = $select.data('heatmap-id');
+        const $heatmap = $(`#${heatmapId}`);
+        const $container = $heatmap.closest('.ph-heatmap-container');
+
+        // 禁用选择器+显示加载中
+        $select.prop('disabled', true);
+        $heatmap.html('<div style="padding: 20px;">加载中...</div>');
+
+        const selectedYear = $select.val() || null;
+        const postType = $container.data('post-type');
+        const timeRange = $container.data('time-range');
+
+        $.ajax({
+            url: phHeatmap.ajaxUrl,
+            type: 'GET',
+            data: {
+                action: 'ph_get_heatmap_data',
+                year: selectedYear,
+                post_type: postType,
+                time_range: timeRange
+            },
+            dataType: 'json',
+            success: function(data) {
+                // 关键修复：传递stats参数
+                renderPostHeatmap(
+                    $heatmap,
+                    data.data,
+                    data.stats, // 传递统计信息
+                    data.year,
+                    data.time_range
+                );
+            },
+            error: function() {
+                alert('数据加载失败，请刷新重试');
+                $heatmap.empty(); // 失败时也清空旧内容
+            },
+            complete: function() {
+                $select.prop('disabled', false); // 恢复选择器
+            }
+        });
+    });
+
+    /**
+     * 核心：渲染热力图
+     * @param {jQuery} $container 容器
      * @param {Object} data 日期-数量映射 {YYYY-MM-DD: count}
+     * @param {Object} stats 统计信息
+     * @param {Number|null} year 年份（null=最近一年）
      * @param {Number} timeRange 时间范围（天）
      */
-    function renderPostHeatmap($container, data, timeRange) {
-        // 1. 计算时间范围（结束日期=今天，开始日期=今天-timeRange天）
-        const today = new Date();
-        const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1); // 今天0点
-        const startDate = new Date();
-        startDate.setDate(endDate.getDate() - timeRange);
+    function renderPostHeatmap($container, data, stats, year, timeRange) {
+        // 1. 计算时间范围
+        let startDate, endDate;
+        if (year) {
+            startDate = new Date(`${year}-01-01`);
+            endDate = new Date(`${year}-12-31`);
+        } else {
+            endDate = new Date();
+            startDate = new Date();
+            startDate.setDate(endDate.getDate() - timeRange);
+        }
 
-        // 2. 生成按周分组的日期矩阵（核心修复：按周日到周六分组，每行是一周的7天）
+        // 2. 生成按周分组的日期矩阵
         const weekMatrix = getWeekMatrix(startDate, endDate);
         const totalWeeks = weekMatrix.length;
-        const cellSize = 13; // 单元格尺寸
-        const cellGap = 2;   // 单元格间隙
+        const cellSize = 13; // 优化后的单元格尺寸
+        const cellGap = 2;
 
-        // 3. 清空容器并构建结构
-        $container.empty();
-        const $tooltip = $('<div class="ph-heatmap-tooltip"></div>').appendTo('body');
+        // 3. 彻底清空容器及附属元素
+        $container.empty(); // 清空热力图容器
+        $container.siblings('.ph-heatmap-legend').remove(); // 删除旧图例
 
-        // 3.1 构建热力图整体容器（星期列 + 主内容）
+        // 修复：用 let 声明 $tooltip，避免 const 重新赋值报错
+        let $tooltip = $('.ph-heatmap-tooltip');
+        if (!$tooltip.length) {
+            $tooltip = $('<div class="ph-heatmap-tooltip"></div>').appendTo('body');
+        }
+
+        // 4. 构建热力图结构
         const $wrapper = $('<div style="display: flex; align-items: flex-start;"></div>');
 
-        // 3.2 星期标签列（固定7行：周日到周六）- 独立列，不与月份重叠
+        // 4.1 星期标签列
         const $weekdaysCol = $('<div class="ph-heatmap-weekdays"></div>');
         const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
         weekdays.forEach(day => {
@@ -50,10 +112,10 @@ jQuery(document).ready(function($) {
         });
         $wrapper.append($weekdaysCol);
 
-        // 3.3 主内容区（月份标签 + 单元格网格）
+        // 4.2 主内容区（月份标签 + 单元格网格）
         const $mainContent = $('<div class="ph-heatmap-main"></div>');
 
-        // 3.4 月份标签行（优化：YYYY-MM格式，按周数动态分配宽度，避开星期列）
+        // 4.3 月份标签行（重新生成，无残留）
         const monthLabels = getMonthLabels(weekMatrix, startDate, endDate, cellSize, cellGap);
         const $monthsRow = $('<div class="ph-heatmap-months"></div>');
         monthLabels.forEach(label => {
@@ -61,18 +123,14 @@ jQuery(document).ready(function($) {
         });
         $mainContent.append($monthsRow);
 
-        // 3.5 单元格网格（核心修复：7行×N列，周日严格对齐第一列）
+        // 4.4 单元格网格
         const $cellsGrid = $('<div class="ph-heatmap-grid"></div>');
-        // 设置网格：7行（周日到周六）×N列（周数）
         $cellsGrid.css({
-            'display': 'grid',
-            'grid-template-rows': `repeat(7, ${cellSize}px)`,
             'grid-template-columns': `repeat(${totalWeeks}, ${cellSize}px)`,
-            'gap': `${cellGap}px`,
-            'margin-top': '18px' // 给月份标签留空间
+            'margin-top': '18px'
         });
 
-        // 遍历每周（列），再遍历7天（行）→ 周日严格对齐第一行第一列
+        // 填充单元格
         weekMatrix.forEach((week, weekIndex) => {
             week.forEach((date, dayIndex) => {
                 let count = 0;
@@ -81,53 +139,31 @@ jQuery(document).ready(function($) {
 
                 if (date) {
                     dateStr = formatDate(date);
-                    // 判断是否是未来日期（今天之后）
-                    isFuture = date > endDate;
+                    isFuture = date > new Date();
                     count = isFuture ? 0 : (data[dateStr] || 0);
                 }
 
-                const level = isFuture ? 0 : getHeatmapLevel(count);
+                const level = getHeatmapLevel(count);
                 const $cell = $(`<div class="ph-heatmap-cell level-${level}"
                                     data-date="${dateStr || ''}"
-                                    data-count="${count}"
-                                    data-is-future="${isFuture}"></div>`);
+                                    data-count="${count}"></div>`);
 
-                // 绑定 tooltip 事件（优化：未来日期也显示日期）
+                // 悬停提示框
                 $cell.hover(
-                    function() {
-                        const $this = $(this);
-                        const cellDate = $this.data('date');
-                        const cellCount = $this.data('count');
-                        const isFuture = $this.data('is-future');
-
-                        let tooltipText = '';
-                        if (cellDate) {
-                            if (isFuture) {
-                                tooltipText = `${cellDate}：未发布`;
-                            } else {
-                                tooltipText = `${cellDate}：${cellCount} 篇`;
-                            }
-                        } else {
-                            tooltipText = '无数据';
-                        }
-
-                        // 定位 tooltip（避免偏移）
-                        const offset = $this.offset();
-                        $tooltip
-                            .text(tooltipText)
-                            .css({
-                                top: `${offset.top - 30}px`,
-                                left: `${offset.left - ($tooltip.outerWidth() / 2 - cellSize / 2)}px`,
-                                opacity: 1,
-                                zIndex: 9999
-                            });
+                    function(e) {
+                        if (!dateStr) return;
+                        const text = `${dateStr}：发布${count}篇文章`;
+                        $tooltip.text(text).css({
+                            top: e.pageY + 10,
+                            left: e.pageX + 10,
+                            opacity: 1
+                        });
                     },
                     function() {
                         $tooltip.css('opacity', 0);
                     }
                 );
 
-                // 计算网格位置：行=周日(0)到周六(6)，列=周数
                 $cell.css({
                     'grid-row': `${dayIndex + 1}`,
                     'grid-column': `${weekIndex + 1}`
@@ -138,9 +174,41 @@ jQuery(document).ready(function($) {
         });
         $mainContent.append($cellsGrid);
         $wrapper.append($mainContent);
+
+        // 4.5 右侧信息区（年份+统计）
+        const $rightInfo = $('<div class="ph-heatmap-right-info"></div>');
+        // 年份标签
+        const displayText = year ? `${year}年` : '最近一年';
+        $rightInfo.append(`<div class="ph-heatmap-year-label">${displayText}</div>`);
+
+        // 统计信息卡片
+        const $statsCard = $(`
+            <div class="ph-heatmap-stats-card">
+                <div class="ph-stats-item">
+                    <span class="ph-stats-label">总发布数：</span>
+                    <span class="ph-stats-value">${stats.total}篇</span>
+                </div>
+                <div class="ph-stats-item">
+                    <span class="ph-stats-label">日均发布：</span>
+                    <span class="ph-stats-value">${stats.daily_avg}篇</span>
+                </div>
+                <div class="ph-stats-item">
+                    <span class="ph-stats-label">最高单日：</span>
+                    <span class="ph-stats-value">${stats.max_daily_date || '无'} ${stats.max_daily}篇</span>
+                </div>
+                <div class="ph-stats-item">
+                    <span class="ph-stats-label">最活跃月份：</span>
+                    <span class="ph-stats-value">${stats.max_month} ${stats.max_month_count}篇</span>
+                </div>
+            </div>
+        `);
+        $rightInfo.append($statsCard);
+        $wrapper.append($rightInfo);
+
+        // 5. 插入到容器
         $container.append($wrapper);
 
-        // 3.6 添加图例
+        // 6. 添加新图例（无残留）
         const $legend = $(`
             <div class="ph-heatmap-legend">
                 <span class="ph-heatmap-legend-label">最少</span>
@@ -154,95 +222,108 @@ jQuery(document).ready(function($) {
                 <span class="ph-heatmap-legend-label">最多</span>
             </div>
         `);
-        $container.append($legend);
+        $container.after($legend);
     }
 
     /**
-     * 辅助函数：生成周矩阵（按周日到周六分组，每行是一周的7天）
-     * 确保周日是每一周的第一个元素，严格对齐第一列
+     * 辅助函数：生成按周分组的日期矩阵
+     * @param {Date} startDate 开始日期
+     * @param {Date} endDate 结束日期
+     * @returns {Array} 二维数组 [周][星期] → 日期对象
      */
     function getWeekMatrix(startDate, endDate) {
         const matrix = [];
-        // 调整起始日期到本周日（核心：确保周日是第一列）
-        let currentWeekStart = new Date(startDate);
-        currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay()); // 周日=0，周一=1...
+        let currentDate = new Date(startDate);
+        let currentWeek = new Array(7).fill(null); // 一周7天
 
-        while (currentWeekStart <= endDate) {
-            const week = [];
-            // 填充本周7天（周日到周六）
-            for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
-                const date = new Date(currentWeekStart);
-                date.setDate(currentWeekStart.getDate() + dayIndex);
-                // 区分过去/今天/未来日期
-                week.push(date <= endDate ? date : new Date(date)); // 未来日期也保留
+        // 定位到第一周的第一天（周日）
+        const firstDay = new Date(startDate);
+        firstDay.setDate(startDate.getDate() - startDate.getDay());
+
+        currentDate = new Date(firstDay);
+
+        // 遍历所有日期
+        while (currentDate <= endDate) {
+            const dayOfWeek = currentDate.getDay(); // 0=周日，6=周六
+            currentWeek[dayOfWeek] = new Date(currentDate);
+
+            // 周末 → 存入矩阵，重置周数组
+            if (dayOfWeek === 6) {
+                matrix.push(currentWeek);
+                currentWeek = new Array(7).fill(null);
             }
-            matrix.push(week);
-            // 下一周
-            currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+
+            // 下一天
+            currentDate.setDate(currentDate.getDate() + 1);
         }
+
+        // 最后一周（未完成）
+        if (currentWeek.some(day => day !== null)) {
+            matrix.push(currentWeek);
+        }
+
         return matrix;
     }
 
     /**
-     * 辅助函数：生成月份标签（优化：YYYY-MM格式，计算偏移和宽度）
+     * 辅助函数：生成月份标签（定位+文本）
+     * @param {Array} weekMatrix 周矩阵
+     * @param {Date} startDate 开始日期
+     * @param {Date} endDate 结束日期
+     * @param {Number} cellSize 单元格尺寸
+     * @param {Number} cellGap 单元格间距
+     * @returns {Array} 月份标签数组
      */
     function getMonthLabels(weekMatrix, startDate, endDate, cellSize, cellGap) {
-        const monthMap = {};
-        const baseOffset = 0; // 基准偏移（避开星期列）
+        const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+        const monthLabels = [];
+        let lastMonth = -1;
 
-        // 遍历每周，记录每周第一个日期的月份
         weekMatrix.forEach((week, weekIndex) => {
-            const firstDate = week[0]; // 每周第一天（周日）
+            // 取每周第一个有效日期
+            const firstDate = week.find(day => day !== null);
             if (!firstDate) return;
 
-            const year = firstDate.getFullYear();
-            const month = firstDate.getMonth() + 1; // 1-12月
-            const monthStr = month < 10 ? `0${month}` : month;
-            const key = `${year}-${monthStr}`; // YYYY-MM格式
+            const month = firstDate.getMonth();
+            if (month === lastMonth) return;
 
-            // 计算该周的偏移和宽度
-            const weekOffset = baseOffset + (weekIndex * (cellSize + cellGap));
-            const weekWidth = cellSize + cellGap;
+            // 计算标签位置：基础宽度改为 30px（足够容纳“10月”等文本）
+            const offset = weekIndex * (cellSize + cellGap) + (cellSize / 2);
+            monthLabels.push({
+                text: monthNames[month],
+                offset: offset,
+                width: 30
+            });
 
-            if (!monthMap[key]) {
-                monthMap[key] = {
-                    text: key,
-                    startOffset: weekOffset,
-                    totalWidth: weekWidth,
-                    weekCount: 1
-                };
-            } else {
-                monthMap[key].totalWidth += weekWidth;
-                monthMap[key].weekCount += 1;
-            }
+            lastMonth = month;
         });
 
-        // 格式化月份标签数据
-        return Object.values(monthMap).map(month => ({
-            text: month.text,
-            offset: month.startOffset,
-            width: month.totalWidth - cellGap // 减去最后一个间隙
-        }));
+        return monthLabels;
     }
 
     /**
      * 辅助函数：格式化日期为 YYYY-MM-DD
+     * @param {Date} date 日期对象
+     * @returns {String} 格式化后的日期
      */
     function formatDate(date) {
+        if (!date) return '';
         const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     /**
-     * 辅助函数：计算热力图等级（0-4）
+     * 辅助函数：计算热力图颜色等级
+     * @param {Number} count 文章数量
+     * @returns {Number} 等级 0-4
      */
     function getHeatmapLevel(count) {
         if (count === 0) return 0;
-        if (count === 1) return 1;
-        if (count <= 3) return 2;
-        if (count <= 5) return 3;
+        if (count < 2) return 1;
+        if (count < 5) return 2;
+        if (count < 10) return 3;
         return 4;
     }
 });
