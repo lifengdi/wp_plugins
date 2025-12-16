@@ -60,7 +60,7 @@ function ph_heatmap_shortcode($atts) {
             'year'        => '',       // 年份（空则显示最近一年）
             'time_range'  => 365,      // 最近N天（默认365）
             'width'       => '100%',   // 热力图宽度
-            'title'       => '文章发布热力图' // 标题
+            'title'       => '热力图' // 标题
         ),
         $atts,
         'post_heatmap'
@@ -126,6 +126,14 @@ function ph_heatmap_shortcode($atts) {
 function ph_heatmap_get_data($post_type = 'post', $year = null, $time_range = 365) {
     global $wpdb;
 
+    // 初始化核心变量（修复未定义问题）
+    $data = array();
+    $total_count = 0;
+    $max_daily = 0;
+    $max_date = '';
+    $monthly_data = array();
+    $weekday_count = array_fill(0, 7, 0); // 0=周日，6=周六
+
     // 条件1：传年份 → 查全年；条件2：不传 → 查最近N天
     if ($year) {
         $start_date = "$year-01-01";
@@ -152,13 +160,7 @@ function ph_heatmap_get_data($post_type = 'post', $year = null, $time_range = 36
         array_merge(array($post_type), $date_args)
     ), ARRAY_A);
 
-    // 整理为 {日期: 数量} 格式 + 统计信息
-    $data = array();
-    $total_count = 0; // 总发布数
-    $max_daily = 0;   // 最高单日发布数
-    $max_date = '';   // 最高发布日期
-    $monthly_data = array_fill(1, 12, 0); // 月度发布数
-
+    // 整理基础数据（必须先初始化$data，再使用）
     foreach ($results as $row) {
         $count = (int)$row['count'];
         $data[$row['date']] = $count;
@@ -170,13 +172,77 @@ function ph_heatmap_get_data($post_type = 'post', $year = null, $time_range = 36
             $max_date = $row['date'];
         }
 
-        // 月度统计
+        // 月度统计（按 Y-m 格式）
         if ($row['date']) {
             $month = date('Y-m', strtotime($row['date']));
             if (!isset($monthly_data[$month])) {
-                $monthly_data[$month] = 0; // 初始化当月数据
+                $monthly_data[$month] = 0;
             }
             $monthly_data[$month] += $count;
+
+            // 每周发布频次统计（新增）
+            $weekday = date('w', strtotime($row['date'])); // 0=周日，6=周六
+            $weekday_count[$weekday] += $count;
+        }
+    }
+
+    // ===== 发布节奏分析（修复：$data已初始化后再使用）=====
+    // 1. 最长断更天数
+    $max_break_days = 0;
+    $max_break_start = '';
+    $date_list = array_keys($data); // 第134行：现在$data已定义
+    sort($date_list);
+
+    if (count($date_list) > 1) {
+        for ($i = 1; $i < count($date_list); $i++) {
+            $prev_date = strtotime($date_list[$i-1]);
+            $curr_date = strtotime($date_list[$i]);
+            $diff_days = ($curr_date - $prev_date) / 86400;
+            if ($diff_days > $max_break_days) {
+                $max_break_days = $diff_days;
+                $max_break_start = $date_list[$i-1];
+            }
+        }
+    }
+
+    // 2. 高频发布周几
+    $max_weekday = 0;
+    $max_weekday_count = 0;
+    foreach ($weekday_count as $weekday => $count) {
+        if ($count > $max_weekday_count) {
+            $max_weekday_count = $count;
+            $max_weekday = $weekday;
+        }
+    }
+    $weekday_names = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    $high_freq_weekday = $weekday_names[$max_weekday];
+
+    // ===== 分类占比统计 =====
+    $category_data = [];
+    if ($post_type === 'post' && $total_count > 0) { // 仅对文章类型统计
+        $category_results = $wpdb->get_results($wpdb->prepare(
+            "SELECT t.name AS cat_name, COUNT(p.ID) AS cat_count
+             FROM {$wpdb->posts} p
+             LEFT JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+             LEFT JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+             LEFT JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+             WHERE p.post_type = %s
+               AND p.post_status = 'publish'
+               AND tt.taxonomy = 'category'
+               AND $date_where
+             GROUP BY t.name
+             ORDER BY cat_count DESC
+             LIMIT 5",
+            array_merge(array($post_type), $date_args)
+        ), ARRAY_A);
+
+        $total_cat_count = array_sum(array_column($category_results, 'cat_count'));
+        foreach ($category_results as $cat) {
+            $category_data[] = [
+                'name' => $cat['cat_name'],
+                'count' => $cat['cat_count'],
+                'percent' => $total_cat_count > 0 ? round(($cat['cat_count'] / $total_cat_count) * 100, 1) : 0
+            ];
         }
     }
 
@@ -184,7 +250,7 @@ function ph_heatmap_get_data($post_type = 'post', $year = null, $time_range = 36
     $daily_average = $total_days > 0 ? round($total_count / $total_days, 2) : 0;
 
     // 找出发布量最高的月份
-    $max_month = 0;
+    $max_month = '';
     $max_month_count = 0;
     foreach ($monthly_data as $month => $count) {
         if ($count > $max_month_count) {
@@ -192,18 +258,25 @@ function ph_heatmap_get_data($post_type = 'post', $year = null, $time_range = 36
             $max_month = $month;
         }
     }
-    $max_month_name = $max_month > 0 ? $max_month . '' : '无';
+    $max_month_name = $max_month ? date('Y-m', strtotime($max_month)) : '无';
 
-    // 返回原始数据+统计信息
+    // 返回所有数据
     return array(
         'raw_data' => $data,
         'stats' => array(
-            'total' => $total_count,          // 总发布数
-            'daily_avg' => $daily_average,    // 日均发布
-            'max_daily' => $max_daily,        // 最高单日
-            'max_daily_date' => $max_date,    // 最高单日日期
-            'max_month' => $max_month_name,   // 最活跃月份
-            'max_month_count' => $max_month_count // 最活跃月份发布数
+            // 基础统计
+            'total' => $total_count,
+            'daily_avg' => $daily_average,
+            'max_daily' => $max_daily,
+            'max_daily_date' => $max_date,
+            'max_month' => $max_month_name,
+            'max_month_count' => $max_month_count,
+			// 分类占比
+//             'category_data' => $category_data,
+            // 发布节奏
+            'high_freq_weekday' => $high_freq_weekday,
+            'max_break_days' => $max_break_days,
+            'max_break_start' => $max_break_start
         )
     );
 }
@@ -219,12 +292,11 @@ function ph_ajax_get_heatmap_data() {
 
     $heatmap_data = ph_heatmap_get_data($post_type, $year, $time_range);
 
-    // 返回JSON数据（含stats）
+    // 返回JSON数据
     wp_send_json(array(
         'data' => $heatmap_data['raw_data'],
-        'stats' => $heatmap_data['stats'], // 确保返回统计信息
+        'stats' => $heatmap_data['stats'],
         'year' => $year,
         'time_range' => $time_range
     ));
 }
-

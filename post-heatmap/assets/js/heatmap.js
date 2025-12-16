@@ -183,25 +183,55 @@ jQuery(document).ready(function($) {
 
         // 统计信息卡片
         const $statsCard = $(`
-            <div class="ph-heatmap-stats-card">
-                <div class="ph-stats-item">
-                    <span class="ph-stats-label">总发布数：</span>
-                    <span class="ph-stats-value">${stats.total}篇</span>
+                <div class="ph-heatmap-stats-card">
+                    <!-- 基础统计模块 -->
+                    <div class="ph-stats-base">
+                        <div class="ph-stats-item">
+                            <span class="ph-stats-label">总发布数：</span>
+                            <span class="ph-stats-value">${stats.total}篇</span>
+                        </div>
+                        <div class="ph-stats-item">
+                            <span class="ph-stats-label">日均发布：</span>
+                            <span class="ph-stats-value">${stats.daily_avg}篇</span>
+                        </div>
+                        <div class="ph-stats-item">
+                            <span class="ph-stats-label">最高单日：</span>
+                            <span class="ph-stats-value">${stats.max_daily_date || '无'} ${stats.max_daily}篇</span>
+                        </div>
+                        <div class="ph-stats-item">
+                            <span class="ph-stats-label">最活跃月份：</span>
+                            <span class="ph-stats-value">${stats.max_month} ${stats.max_month_count}篇</span>
+                        </div>
+                    </div>
+
+                    <!-- 发布节奏模块 -->
+                    <div class="ph-stats-rhythm">
+                        <div class="rhythm-item">
+                            <span class="rhythm-label">高频时段：</span>
+                            <span class="rhythm-tag">每周${stats.high_freq_weekday}</span>
+                        </div>
+                        <div class="rhythm-item">
+                            <span class="rhythm-label">最长断更：</span>
+                            <span class="rhythm-tag">${stats.max_break_days || 0}天</span>
+                        </div>
+                    </div>
+
+                    <!-- 分类占比模块（有数据才显示） -->
+                    ${stats.category_data && stats.category_data.length > 0 ? `
+                    <div class="ph-stats-category">
+                        ${stats.category_data.map(cat => `
+                        <div class="category-item">
+                            <span class="category-label">${cat.name}</span>
+                            <div class="category-bar">
+                                <div class="bar-fill" style="width: ${cat.percent}%;"></div>
+                            </div>
+                            <span class="category-percent">${cat.percent}%</span>
+                        </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
                 </div>
-                <div class="ph-stats-item">
-                    <span class="ph-stats-label">日均发布：</span>
-                    <span class="ph-stats-value">${stats.daily_avg}篇</span>
-                </div>
-                <div class="ph-stats-item">
-                    <span class="ph-stats-label">最高单日：</span>
-                    <span class="ph-stats-value">${stats.max_daily_date || '无'} ${stats.max_daily}篇</span>
-                </div>
-                <div class="ph-stats-item">
-                    <span class="ph-stats-label">最活跃月份：</span>
-                    <span class="ph-stats-value">${stats.max_month} ${stats.max_month_count}篇</span>
-                </div>
-            </div>
-        `);
+            `);
         $rightInfo.append($statsCard);
         $wrapper.append($rightInfo);
 
