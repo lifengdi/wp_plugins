@@ -205,16 +205,19 @@ jQuery(document).ready(function($) {
                     </div>
 
                     <!-- 发布节奏模块 -->
-                    <div class="ph-stats-rhythm">
-                        <div class="rhythm-item">
-                            <span class="rhythm-label">高频时段：</span>
-                            <span class="rhythm-tag">每周${stats.high_freq_weekday}</span>
-                        </div>
-                        <div class="rhythm-item">
-                            <span class="rhythm-label">最长断更：</span>
-                            <span class="rhythm-tag">${stats.max_break_days || 0}天</span>
-                        </div>
-                    </div>
+                    ${!stats.category_data || stats.category_data.length === 0 ? `
+					<div class="ph-stats-rhythm">
+						<div class="rhythm-item">
+							<span class="rhythm-label">高频时段：</span>
+							<span class="rhythm-tag">每周${stats.high_freq_weekday || '无'}</span>
+						</div>
+						<div class="rhythm-item">
+							<span class="rhythm-label">最长断更：</span>
+							<span class="rhythm-tag">${stats.max_break_days || 0}天</span>
+						</div>
+					</div>
+					` : ''}
+
 
                     <!-- 分类占比模块（有数据才显示） -->
                     ${stats.category_data && stats.category_data.length > 0 ? `
