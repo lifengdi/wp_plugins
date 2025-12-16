@@ -232,7 +232,7 @@ function ph_heatmap_get_data($post_type = 'post', $year = null, $time_range = 36
                AND $date_where
              GROUP BY t.name
              ORDER BY cat_count DESC
-             LIMIT 5",
+             LIMIT 4",
             array_merge(array($post_type), $date_args)
         ), ARRAY_A);
 
@@ -272,7 +272,7 @@ function ph_heatmap_get_data($post_type = 'post', $year = null, $time_range = 36
             'max_month' => $max_month_name,
             'max_month_count' => $max_month_count,
 			// 分类占比
-//             'category_data' => $category_data,
+            'category_data' => $category_data,
             // 发布节奏
             'high_freq_weekday' => $high_freq_weekday,
             'max_break_days' => $max_break_days,
