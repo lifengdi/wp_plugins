@@ -29,7 +29,6 @@
     border-radius: 4px;
     cursor: pointer;
     transition: border-color 0.2s;
-    width: 95px;
 }
 
 .ph-year-select:focus {
