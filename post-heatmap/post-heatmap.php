@@ -74,10 +74,25 @@ function ph_heatmap_shortcode($atts) {
     $title        = sanitize_text_field($atts['title']);
     $heatmap_id   = 'ph-heatmap-' . uniqid(); // 唯一ID
 
+    global $wpdb;
+    // 查询已发布文章的最早发布年份（仅取年份）
+    $earliest_year = $wpdb->get_var($wpdb->prepare(
+        "SELECT YEAR(MIN(post_date))
+         FROM {$wpdb->posts}
+         WHERE post_type = %s
+           AND post_status = 'publish'
+           AND post_date <= NOW()", // 排除未来时间的文章
+        $post_type
+    ));
+    // 边界处理：无文章时，最早年份设为当前年份
+    $current_year = date('Y');
+    $earliest_year = $earliest_year ? absint($earliest_year) : $current_year;
+
+
     // 生成年份选择器选项（近10年 + 最近一年）
     $current_year = date('Y');
-    $start_year   = $current_year - 9;
-    $years        = range($start_year, $current_year);
+    $years        = range($earliest_year, $current_year);
+    rsort($years);
 
     // 获取热力图数据（含统计信息）
     $heatmap_data = ph_heatmap_get_data($post_type, $selected_year, $time_range);
