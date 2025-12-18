@@ -1,0 +1,133 @@
+.month-calendar, #demo-huangli {
+    display: none;
+    position: relative;
+    margin: 20px auto;
+    /*width: 588px;*/
+    clear: both;
+    overflow: hidden;
+    border-radius: 16px;
+    padding: 20px;
+    -webkit-box-shadow: 0 2px 8px 0 rgba(0, 0, 0, .08);
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, .08);
+}
+
+.month-calendar *, #demo-huangli * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#demo-huangli {
+    text-align: center;
+    /*color: #888;*/
+}
+
+#demo-huangli i, #demo-huangli li {
+    font-style: normal;
+    font-size: 14px;
+}
+
+#demo-huangli .solar {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+#demo-huangli .lunar {
+    font-size: 22px;
+    color: #f11;
+    margin-bottom: 10px;
+}
+
+#demo-huangli .gz {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+#demo-huangli table {
+    width: 100%;
+    border-collapse: collapse;
+    border-style: none;
+    /*border-right: 1px solid #e2e2e2;*/
+    /*border-bottom: 1px solid #e2e2e2;*/
+}
+
+#demo-huangli table td {
+    /*border-left: 1px solid #e2e2e2;*/
+    /*border-top: 1px solid #e2e2e2;*/
+    padding: 3px;
+}
+
+#demo-huangli table td div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-content: space-between;
+    margin: 0 10px;
+}
+
+#demo-huangli table td div u {
+    flex: 1;
+    text-decoration: none;
+    text-align: center;
+}
+
+#demo-huangli table td.h div {
+    flex-direction: row;
+}
+
+#demo-huangli table td.v b, #demo-huangli table td.v i {
+    width: 1.2em;
+    display: block;
+    margin: 0 auto;
+}
+
+#demo-huangli table td b {
+    font-weight: normal;
+    color: #c69c70;
+}
+
+#demo-huangli table td ul {
+}
+
+#demo-huangli table td li {
+    list-style: none;
+    padding: 0 3px;
+    float: left;
+}
+
+#demo-huangli .yi, #demo-huangli .ji {
+    clear: both;
+    overflow: hidden;
+    padding-left: 30px;
+    position: relative;
+    line-height: 26px;
+    margin-bottom: 10px;
+}
+
+#demo-huangli .yi::before, #demo-huangli .ji::before {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    border-radius: 50%;
+    background-color: #4e6ef2;
+    color: #fff;
+    font-size: 12px;
+}
+
+#demo-huangli .yi::before {
+    content: '宜';
+}
+
+#demo-huangli .ji::before {
+    content: '忌';
+    background-color: #f11;
+}
+
+#demo-huangli .yi i, #demo-huangli .ji i {
+    float: left;
+    margin: 0 3px;
+}
