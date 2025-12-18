@@ -88,12 +88,12 @@
 }
 
 .month-calendar div.prev:before {
-    left: 5px;
+    /*left: 5px;*/
     border-right-color: #717171;
 }
 
 .month-calendar div.next:before {
-    right: 5px;
+    /*right: 5px;*/
     border-left-color: #717171;
 }
 
