@@ -55,7 +55,7 @@
     list-style: none;
     float: left;
     display: block;
-    width: 84px;
+    width: 94px;
     height: 64px;
     text-align: center;
 }
@@ -63,7 +63,7 @@
 .month-calendar div {
     position: relative;
     margin: 0 auto;
-    width: 80px;
+    width: 88px;
     height: 64px;
     border-radius: 10px;
 }
