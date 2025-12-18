@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Chinese Almanac
  * Plugin URI: https://www.lifengdi.com/
- * Description: 显示中国传统黄历信息 [chinese_almanac date="2024-06-01"]
+ * Description: 显示中国传统黄历信息 [chinese_almanac]
  * Version: 1.0.0
  * Author: Dylan Li
  * Author URI: https://www.lifengdi.com/
