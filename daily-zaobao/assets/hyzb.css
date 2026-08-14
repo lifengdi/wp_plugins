@@ -1,0 +1,197 @@
+/**
+ * Front-end layout for generated 每日早报 posts.
+ *
+ * Loaded only on posts this plugin created. Colours are inherited from the
+ * active theme; only layout and image sizing are defined here.
+ */
+
+.hyzb-section {
+	margin: 0 0 2.5em;
+}
+
+.hyzb-section-title {
+	margin: 0 0 0.8em;
+}
+
+.hyzb-board-meta {
+	margin: 0 0 1em;
+	opacity: 0.7;
+}
+
+/* Header artwork: full width, fixed shape, cropped rather than letterboxed.
+   aspect-ratio is used instead of a fixed height because themes almost always
+   ship `img { height: auto }`, which would otherwise win and leave the box
+   short — the gap this avoids below the image. */
+.hyzb-figure {
+	position: relative;
+	margin: 0 0 1.5em;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	overflow: hidden;
+	border-radius: 6px;
+	background: rgba(127, 127, 127, 0.12);
+}
+
+.hyzb-section .hyzb-figure img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	/* Offsets on all sides make the used height resolve to the container even if
+	   the theme forces height:auto. */
+	right: 0;
+	bottom: 0;
+	object-fit: cover;
+	object-position: center;
+	display: block;
+	margin: 0;
+	max-width: none;
+	border-radius: 0;
+}
+
+.hyzb-list {
+	margin: 0;
+	padding-left: 1.4em;
+}
+
+/* Unordered item lists carry a thumbnail, so the bullet is just noise. Ordered
+   lists keep their markers — the number is the ranking. Themes add bullets three
+   different ways, so all three are cleared. */
+ul.hyzb-items {
+	list-style: none;
+	padding-left: 0;
+}
+
+ul.hyzb-items > li {
+	list-style: none;
+}
+
+ul.hyzb-items > li::marker {
+	content: none;
+}
+
+ul.hyzb-items > li::before {
+	content: none;
+	display: none;
+}
+
+.hyzb-list > li {
+	margin: 0 0 1.2em;
+}
+
+.hyzb-list > li:last-child {
+	margin-bottom: 0;
+}
+
+/* Plain-text bulletins (每日早报) have no thumbnail, so they stay a simple list. */
+.hyzb-bulletins > li {
+	margin-bottom: 0.7em;
+	line-height: 1.7;
+}
+
+.hyzb-weiyu {
+	margin: 1.5em 0 0;
+}
+
+/* Thumbnail left, text right. */
+.hyzb-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 1em;
+}
+
+/* Fixed width, shape driven by aspect-ratio so no explicit height is needed. */
+.hyzb-thumb {
+	position: relative;
+	display: block;
+	flex: 0 0 140px;
+	width: 140px;
+	aspect-ratio: 3 / 2;
+	overflow: hidden;
+	border-radius: 4px;
+	background: rgba(127, 127, 127, 0.12);
+	/* Guards against a theme's `a { text-decoration: underline }` drawing a line
+	   under the thumbnail link. */
+	text-decoration: none;
+	line-height: 0;
+}
+
+/* Selector is deliberately specific: theme rules like `.entry-content img` and
+   `img { height: auto }` would otherwise beat a bare `.hyzb-thumb img`, letting
+   the image render at its intrinsic size and leave gaps inside the box. */
+.hyzb-items .hyzb-thumb img {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	display: block;
+	margin: 0;
+	padding: 0;
+	max-width: none;
+	min-width: 0;
+	min-height: 0;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+}
+
+/* min-width:0 lets long unbroken titles wrap instead of stretching the row. */
+.hyzb-item-body {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.hyzb-item-title {
+	margin: 0;
+	font-weight: 600;
+	line-height: 1.5;
+}
+
+.hyzb-item-digest {
+	margin: 0.4em 0 0;
+	line-height: 1.6;
+	opacity: 0.85;
+}
+
+.hyzb-item-meta {
+	margin: 0.4em 0 0;
+	opacity: 0.65;
+}
+
+.hyzb-attribution {
+	margin: 2em 0 0;
+	opacity: 0.7;
+}
+
+@media (max-width: 600px) {
+	.hyzb-figure {
+		aspect-ratio: 3 / 2;
+	}
+
+	.hyzb-thumb {
+		flex-basis: 96px;
+		width: 96px;
+	}
+
+	.hyzb-item {
+		gap: 0.8em;
+	}
+}
+
+/* Very old browsers without aspect-ratio support: fall back to a fixed height so
+   the box still has one, rather than collapsing to zero. */
+@supports not (aspect-ratio: 1 / 1) {
+	.hyzb-figure {
+		height: 260px;
+	}
+
+	.hyzb-thumb {
+		height: 94px;
+	}
+}
